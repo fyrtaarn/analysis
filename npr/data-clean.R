@@ -8,15 +8,20 @@ kh_load(char = pkg)
 
 # NPR
 # -----
-npr <- fread("Data/utlevering/23_48146_kpr_til_utlevering.csv")
-fst::write_fst(npr, "npr2023des.fst")
+## npr <- fread("Data/utlevering/23_48146_kpr_til_utlevering.csv")
+## fst::write_fst(npr, "npr2023des.fst")
 dt1 <- fst::read_fst("./Data/npr2023des.fst")
+setDT(dt1)
 str(dt1)
+
+dt1[lopenr == 876389]
+uniqueN(dt1$lopenr)
 
 
 # Somatic
 # --------------
-som <- fread("Data/utlevering/23_31310_som_til_utlevering.csv")
-fst::write_fst(som, "som2023des.fst")
+## som <- fread("Data/utlevering/23_31310_som_til_utlevering.csv")
+## fst::write_fst(som, "som2023des.fst")
 dt2 <- fst::read_fst("./Data/som2023des.fst")
+setDT(dt2)
 str(dt2)
