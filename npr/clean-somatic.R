@@ -1,4 +1,3 @@
-source("setup.R")
 
 # Somatic
 # --------------
