@@ -7,6 +7,7 @@
 dt2 <- fst::read_fst("./Data/fmds2023des.fst")
 setDT(dt2)
 str(dt2)
+names(dt2)
 
 # Demografisk
 dt2[, .N, by = kjonn]

@@ -3,8 +3,14 @@
 * NPR Somatikk
 - En pasient kan ha flere episoder ie. ~nyTilstand = 1~
 - Bruk =utDato= og =innDato= for å beregne =liggetid=
--
+- Noe å tenke på fra følgebrevet:
+
+  Merk at det er et høyt antall skadeepisoder med relevante ICD-10 koder
+  registrert i NPR avtalespesialister. Avtalespesialistdata har derimot ikke blitt etterspurt og er derfor ikke inkludert i denne utleveringen, dette kan eventuelt etterspørres ved en senere anledning hvis ønskelig etter søknad og godkjenning hos HDS.
 
 * FMDS
+
+- Variabel =komNrSkade= er Skadestedkommune.
+-
 
 * KPR
