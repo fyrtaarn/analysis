@@ -1,0 +1,10 @@
+#+title: Kommentar til datasettet
+
+* NPR Somatikk
+- En pasient kan ha flere episoder ie. ~nyTilstand = 1~
+- Bruk =utDato= og =innDato= for å beregne =liggetid=
+-
+
+* FMDS
+
+* KPR
