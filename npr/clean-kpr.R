@@ -12,7 +12,7 @@ uniqueN(dt3$lopenr)
 names(dt3)
 
 # Demografisk
-dt3[, .N, by = kjonn]
+dt3[!duplicated(lopenr), .N, by = kjonn]
 
 # Kontakttype - mangler
 

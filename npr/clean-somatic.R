@@ -22,7 +22,7 @@ dt1[!duplicated(lopenr), .N, by = fodsNr_Gyldig] #607295 og ikke 607296 som i br
 dt1[fodsNr_Gyldig == 0,][sample(.N, 20)]
 
 # Demografisk
-dt1[, .N, by = kjonn]
+dt1[!duplicated(lopenr), .N, by = kjonn]
 
 # Hastegrad 0=ikke akutt 1=akutt
 dt1[!duplicated(lopenr), .N, by = Hastegrad]

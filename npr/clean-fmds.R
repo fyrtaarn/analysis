@@ -10,7 +10,7 @@ str(dt2)
 names(dt2)
 
 # Demografisk
-dt2[, .N, by = kjonn]
+dt2[!duplicated(lopenr), .N, by = kjonn]
 
 # Fødselsnummer
 dt2[, .N, by = fodsNr_Gyldig] #6290 - ugyldig
