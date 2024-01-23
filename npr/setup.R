@@ -6,4 +6,11 @@ pkg <- c("pacman","data.table", "fst", "lubridate")
 kh_load(char = pkg)
 
 
+## ----------
+## kodebok
+## ----------
+kb <- fread("./Data/Kodebok_Skader_i_Norge.csv")
 
+kb[, .N, by = variabel]
+
+kb[variabel == "kjonn"]
