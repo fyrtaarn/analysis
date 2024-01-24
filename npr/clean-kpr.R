@@ -1,7 +1,7 @@
 
 # KPR - data fra 01.01.2022 - 01.10.2023
 # -----
-## kpr <- fread("Data/02_extracted/23_48146_kpr_til_utlevering.csv")
+## kpr <- fread("Data/02_extracted/23_48146_kpr_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(kpr, "./Data/kpr2023des.fst")
 dt3 <- fst::read_fst("./Data/kpr2023des.fst")
 setDT(dt3)

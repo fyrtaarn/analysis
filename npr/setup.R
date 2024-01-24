@@ -9,8 +9,11 @@ kh_load(char = pkg)
 ## ----------
 ## kodebok
 ## ----------
-kb <- fread("./Data/Kodebok_Skader_i_Norge.csv")
+kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 
 kb[, .N, by = variabel]
 
 kb[variabel == "kjonn"]
+kb[variabel == "omsorgsniva"]
+kb[variabel == "kontaktType"]
+kb[variabel %like% "takst"]
