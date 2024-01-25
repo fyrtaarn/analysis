@@ -1,4 +1,14 @@
 #+title: Kommentar til datasettet
+* Definisjon
+[[https://www.helsedirektoratet.no/tema/statistikk-registre-og-rapporter/helsedata-og-helseregistre/norsk-pasientregister-npr/innhold-og-kvalitet-i-npr][Kodeverk og variabler fra HDir]]
+
+** Episode
+- Tidsperiode hvor pasienten får helsehjelp ved én og samme helseinstitusjon for ett og samme helseproblem.
+- En episode kan være en poliklinisk kontakt eller et avdelingsopphold (dagopphold eller døgnopphold).
+- En episode betegner aktivitet, ikke bare behandling.
+** Sykehusopphold
+Gruppering av episoder for økonomisk oppgjør. Episoder som henger sammen i tid og slås sammen til opphold ut fra ISF-regelverket.
+
 
 * NPR Somatikk
 - En pasient kan ha flere episoder ie. ~nyTilstand = 1~
@@ -14,3 +24,7 @@
 
 * KPR
 - Variabel =kjonn= kodet som 1, 2 og -1 dvs. -1 er ikke i kodeboka.
+- Variabel =Kontakttype= mangler
+
+* Johan spørsmål
+Hvor mange pasienter er det hvert år som får en eller flere bidiagnoser i kapital XIX S00-T78?

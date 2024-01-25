@@ -17,3 +17,6 @@ kb[variabel == "kjonn"]
 kb[variabel == "omsorgsniva"]
 kb[variabel == "kontaktType"]
 kb[variabel %like% "takst"]
+
+kb[variabel %like% "Mekanisme"]
+kb[variabel %like% "Haste"]

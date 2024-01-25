@@ -15,3 +15,6 @@ dt2[!duplicated(lopenr), .N, by = kjonn]
 # Fødselsnummer
 dt2[, .N, by = fodsNr_Gyldig] #6290 - ugyldig
 dt2[!duplicated(lopenr), .N, by = fodsNr_Gyldig] #226507 og ikke 226508 som i brevet
+
+dt2[lopenr == 679011]
+dt2[lopenr == 998945] #finnes i somatikk men ikke fmds
