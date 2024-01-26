@@ -30,7 +30,10 @@ dt1[lopenr == 876389]
 dt1[lopenr == 290124] #4 episoder
 dt1[lopenr == 679011] #ingen ny episode
 
-dt1[lopenr == 998945] #10
+dt1[lopenr == 998945] #10 - 1 episoder
+dt1[lopenr == 577056] #10 - 3 episoder?
+dt1[lopenr == 485540] #10 - 3 episoder?
+
 
 dt1[lopenr == 128429] #15
 dt1[lopenr == 33597] #15
