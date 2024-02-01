@@ -15,8 +15,10 @@ dt1[, lnr := 1:.N]
 # Create a dummy var for merging
 dt1[, mergeVar := innDato]
 
-# Hoved- og bidiagnoser, flere koder skal deles til egne kolonner
-nr <- c("hovednr", "bidianr")
+# Hoved- og bidiagnoser
+# Gjelder bare utvalgte koder dvs. S00 til T78
+kodeURL <- "https://github.com/fyrtaarn/analysis/raw/main/data/validCodes.RDS"
+kode <- readRDS(url(kodeURL))
 
 dt1[, hovednr := length(unlist(strsplit(hoveddiagnoser, " "))), by = lnr]
 dt1[, bidianr := length(unlist(strsplit(bidiagnoser, " "))), by = lnr]
