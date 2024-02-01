@@ -20,6 +20,9 @@ dt1[, mergeVar := innDato]
 kodeURL <- "https://github.com/fyrtaarn/analysis/raw/main/data/validCodes.RDS"
 kode <- readRDS(url(kodeURL))
 
+## Hvilke av cases som er gylding dvs S00 til T78 som hoveddiagnose
+dt1[, case := sum(grepl(paste0("^", paste(codes, collapse = "|")), hoveddiagnoser)) > 0, by = lnr]
+
 dt1[, hovednr := length(unlist(strsplit(hoveddiagnoser, " "))), by = lnr]
 dt1[, bidianr := length(unlist(strsplit(bidiagnoser, " "))), by = lnr]
 
