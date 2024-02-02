@@ -6,7 +6,7 @@
 DT1 <- fst::read_fst("./Data/som2023des.fst")
 setDT(DT1)
 
-# Duplikater
+# Delete duplikater
 dt1 <- DT1[!duplicated(DT1)]
 
 # Sort
@@ -16,21 +16,9 @@ dt1[, lnr := 1:.N]
 dt1[, mergeVar := innDato]
 
 # Hoved- og bidiagnoser
-# Gjelder bare utvalgte koder dvs. S00 til T78
-kodeURL <- "https://github.com/fyrtaarn/analysis/raw/main/data/validCodes.RDS"
-kode <- readRDS(url(kodeURL))
-
-## Hvilke av cases som er gylding dvs S00 til T78 som hoveddiagnose
-dt1[, case := sum(grepl(paste0("^", paste(codes, collapse = "|")), hoveddiagnoser)) > 0, by = lnr]
-
-dt1[, hovednr := length(unlist(strsplit(hoveddiagnoser, " "))), by = lnr]
-dt1[, bidianr := length(unlist(strsplit(bidiagnoser, " "))), by = lnr]
-
-homax <- paste0("hovdiag", 1:max(dt1$hovednr))
-dt1[, (homax) := tstrsplit(hoveddiagnoser, " ")]
-
-bimax <- paste0("bidiag", 1:max(dt1$bidianr))
-dt1[, (bimax) := tstrsplit(bidiagnoser, " ")]
+## Hvilke av cases som er gylding dvs S00 til T78 som hoveddiagnose og bidiagnose
+dt1 <- get_valid_codes(dt = dt1, "hoveddiagnoser", "hovdiag")
+dt1 <- get_valid_codes(dt = dt1, "bidiagnoser", "bidiag", sep = " ")
 
 # Leggetid - bruk innDato og utDato
 dt1[, liggetid := as.numeric(difftime(utDato, innDato, units = "days"))]
