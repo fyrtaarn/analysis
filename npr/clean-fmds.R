@@ -1,20 +1,17 @@
 
 # FMDS
 # -----
-## fmds <- fread("Data/02_extracted/23_31310_fmds_til_utlevering.csv")
+## fmds <- fread("Data/02_extracted/23_31310_fmds_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(fmds, "./Data/fmds2023des.fst")
 
-dt2 <- fst::read_fst("./Data/fmds2023des.fst")
-setDT(dt2)
-str(dt2)
-names(dt2)
+DT2 <- fst::read_fst("./Data/fmds2023des.fst", as.data.table = TRUE)
+DT2[, helseforetak_Navn := do_encode(helseforetak_Navn)]
 
-# Demografisk
-dt2[!duplicated(lopenr), .N, by = kjonn]
+# Delete duplikater
+dt2 <- unique(DT2)
 
-# Fødselsnummer
-dt2[, .N, by = fodsNr_Gyldig] #6290 - ugyldig
-dt2[!duplicated(lopenr), .N, by = fodsNr_Gyldig] #226507 og ikke 226508 som i brevet
-
-dt2[lopenr == 679011]
-dt2[lopenr == 998945] #finnes i somatikk men ikke fmds
+dt2 <- dt2[order(lopenr, skadeDato,)] #sort
+dt2[, lnr := 1:.N] # linenumber
+# Create a dummy var for merging
+dt2[, mergeVar := skadeDato]
+dt2

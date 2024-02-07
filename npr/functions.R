@@ -1,11 +1,15 @@
 ## Functions to use
 
-# Split columns with multiple input
-# @param dt Dataset
-# @param select.col Columnames from dataset
-# @param create.col New columnames to be created
-# @param sep Separate symbols
+#' Split columns with multiple input
+#' @param dt Dataset
+#' @param select.col Columnames from dataset
+#' @param create.col New columnames to be created
+#' @param sep Separate symbols
 get_valid_codes <- function(dt, select.col, create.col, sep = " "){
+
+  if (!("lnr" %in% names(dt))){
+    dt1[, lnr := 1:.N] # linenumber
+  }
 
   dt[, colnr := length(unlist(strsplit(get(select.col), sep))), by = lnr]
 
@@ -25,3 +29,4 @@ get_valid_codes <- function(dt, select.col, create.col, sep = " "){
   xcols <- c("colnr", cols)
   dt[, (xcols) := NULL][]
 }
+

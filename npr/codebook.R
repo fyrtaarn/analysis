@@ -4,7 +4,14 @@
 ## ----------
 kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 
-kb[, .N, by = variabel]
+vars <- kb[, .N, by = variabel]
+var2 <- vars[N < 30 & !(variabel %like% "^takst") , c(variabel)]
+
+for (i in var2){
+  print(i)
+  print(kb[variabel == i])
+}
+
 
 kb[variabel == "kjonn"]
 kb[variabel == "omsorgsniva"]

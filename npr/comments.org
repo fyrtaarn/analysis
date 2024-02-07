@@ -9,6 +9,9 @@
 ** Sykehusopphold
 Gruppering av episoder for økonomisk oppgjør. Episoder som henger sammen i tid og slås sammen til opphold ut fra ISF-regelverket.
 
+* Operasjonelt definisjon
+- Inkluderer bare hoveddiagnose med koder S00 til T78
+- Hastergrad 1
 
 * NPR Somatikk
 - En pasient kan ha flere episoder ie. ~nyTilstand = 1~
@@ -20,7 +23,21 @@ Gruppering av episoder for økonomisk oppgjør. Episoder som henger sammen i tid
 * FMDS
 
 - Variabel =komNrSkade= er Skadestedkommune.
--
+** Spørsmål
+1. Det finnes to variabler for fødselsår og de er =fodtAar_FMDS= og =fodtAare=.
+   I brevet står det
+
+   #+begin_quote
+   Vi gjør oppmerksom på at vi har inkludert variabler for kjønn og fødselsår
+   innrapportert til FMDS i tillegg til å inkludere kjønn- og
+   fødselsårsvariabler vasket mot folkeregisteret. Dette er gjort ettersom vi
+   ikke har tilgang til folkeregisteropplysninger for de episoder hvor personen
+   er innrapportert med ugyldig fødselsnummer
+   #+end_quote
+
+   Noen alders har alt for stor forskjell. F.eks ~dt2[lopenr == 92907, .(fodtAar_FMDS, fodtAar)]~
+2. Det samme for variabler kjonn dvs =kjonn_FMDS= og =kjonn=. 44 persienter har
+   forskjellige kjonn det som er registeret og renset
 
 * KPR
 - Variabel =kjonn= kodet som 1, 2 og -1 dvs. -1 er ikke i kodeboka.

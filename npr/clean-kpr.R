@@ -3,7 +3,7 @@
 # -----
 ## kpr <- fread("Data/02_extracted/23_48146_kpr_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(kpr, "./Data/kpr2023des.fst")
-dt3 <- fst::read_fst("./Data/kpr2023des.fst")
+dt3 <- fst::read_fst("./Data/kpr2023des.fst", as.data.table = TRUE)
 setDT(dt3)
 str(dt3)
 
