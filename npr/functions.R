@@ -11,10 +11,10 @@ get_valid_codes <- function(dt, select.col, create.col, sep = " "){
     dt1[, lnr := 1:.N] # linenumber
   }
 
-  dt[, colnr := length(unlist(strsplit(get(select.col), sep))), by = lnr]
+  dt[, colnr := length(unlist(strsplit(col1, sep))), by = lnr, env = list(col1 = select.col)]
 
   cols <- paste0("temp", 1:max(dt$colnr))
-  dt[, (cols) := data.table::tstrsplit(get(select.col), " ")]
+  dt[, (cols) := data.table::tstrsplit(col1, " "), env = list(col1 = select.col)]
 
   # Only these codes S00 til T78
   codeURL <- "https://github.com/fyrtaarn/analysis/raw/main/data/validCodes.RDS"
