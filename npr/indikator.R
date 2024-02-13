@@ -40,7 +40,7 @@ aisMek[order(skadeMekanisme)]
 # Lettere skadd i trafikkulykker
 # ------------------------------
 ais2 <- dt2[kontaktarsakSkade == 1, ][ #Ulykkesskade
-  alvorlighetsgrad %in% 1:2][ #AIS 3+
+  alvorlighetsgrad %in% 1:2][ #AIS 1 & 2
     skadeSted %in% c("V1","N"),]
 
 # Kjønn
