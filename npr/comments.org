@@ -35,7 +35,9 @@ Gruppering av episoder for økonomisk oppgjør. Episoder som henger sammen i tid
    er innrapportert med ugyldig fødselsnummer
    #+end_quote
 
-   Noen alders har alt for stor forskjell. F.eks ~dt2[lopenr == 92907, .(fodtAar_FMDS, fodtAar)]~
+[[file:scratch/dirty-fmds.R::Alder][Koder for alder]]
+
+Noen alders har alt for stor forskjell. F.eks ~dt2[lopenr == 92907, .(fodtAar_FMDS, fodtAar)]~
 2. Det samme for variabler kjonn dvs =kjonn_FMDS= og =kjonn=. 44 persienter har
    forskjellige kjonn det som er registeret og renset
 
