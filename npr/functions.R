@@ -30,3 +30,42 @@ get_valid_codes <- function(dt, select.col, create.col, sep = " "){
   dt[, (xcols) := NULL][]
 }
 
+
+#' Recode age into groups
+#' @param dt Dataset
+#' @param col Column name for age
+#' @param category How to categorise age into groups eg. seq(1,70, 10, Inf)
+do_agegroup <- function(dt, col, category){
+  AGEGP <- grp <- ageGRP <- up <- lo <- NULL
+
+  if(!is(dt,"data.table"))
+    data.table::setDT(dt)
+
+  DT <- data.table::copy(dt)
+  x <- DT[, .(min = min(col, na.rm = T), max = max(col, na.rm = T)), env = list(col = col)]
+
+  KB <- data.table::data.table(AGEGP = x$min:x$max, grp = NA)
+  KB[, "grp" := cut(AGEGP, breaks = category, right = FALSE)]
+  KB[, "ageGRP" := sub("\\[(.*)\\)", "\\1", grp)]
+
+  ageVars <- c("lo", "up")
+  KB[, (ageVars) := data.table::tstrsplit(ageGRP, ",")]
+
+  for (j in ageVars){
+    suppressWarnings(data.table::set(KB, j = j, value = as.numeric(KB[[j]])))
+  }
+
+  KB[, "up" := up - 1]
+  agp <- "alderGRP"
+  KB[up != Inf, (agp) := paste0(lo, "-", up)]
+  KB[up == Inf, (agp) := paste0(lo, "+")]
+
+  delCols <- c(ageVars, "ageGRP", "grp")
+  KB[, (delCols) := NULL]
+  data.table::setnames(KB, agp, "GRP")
+
+  data.table::setkeyv(DT, col)
+  data.table::setkey(KB, AGEGP)
+
+  DT[KB, GRP := GRP][]
+}
