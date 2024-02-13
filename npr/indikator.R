@@ -35,3 +35,32 @@ aisFrem[order(fremkomstmiddel)]
 aisMek <- ais3[, .N, by = skadeMekanisme]
 aisMek[kb[variabel == "skadeMekanisme",], on = c(skadeMekanisme = "kode"), beskrivelse := beskrivelse][]
 aisMek[order(skadeMekanisme)]
+
+
+# Lettere skadd i trafikkulykker
+# ------------------------------
+ais2 <- dt2[kontaktarsakSkade == 1, ][ #Ulykkesskade
+  alvorlighetsgrad %in% 1:2][ #AIS 3+
+    skadeSted %in% c("V1","N"),]
+
+# Kjønn
+aisKJ2 <- ais2[, .N, by = kjonn]
+aisKJ2[, kjonn := as.character(kjonn)]
+aisKJ2[kb[variabel == "kjonn",], on = c(kjonn = "kode"), beskrivelse := beskrivelse][]
+
+# Alder
+ais2[, .N, keyby = GRP]
+
+# Kjønn og Alder
+ais2[, .N, keyby = .(kjonn, GRP)]
+
+# Fremkomstmiddel
+aisFrem <- ais2[, .N, by = fremkomstmiddel]
+aisFrem[kb[variabel == "fremkomstmiddel",], on = c(fremkomstmiddel = "kode"), beskrivelse := beskrivelse][]
+aisFrem[order(fremkomstmiddel)]
+
+
+# Skademekanisme
+aisMek <- ais2[, .N, by = skadeMekanisme]
+aisMek[kb[variabel == "skadeMekanisme",], on = c(skadeMekanisme = "kode"), beskrivelse := beskrivelse][]
+aisMek[order(skadeMekanisme)]
