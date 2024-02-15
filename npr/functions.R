@@ -69,3 +69,14 @@ do_agegroup <- function(dt, col, category){
 
   DT[KB, GRP := GRP][]
 }
+
+
+#' Simple scatterplot
+plot_dots <- function(dt, x, y){
+  plotAge <- ggplot(dt, aes({{x}}, {{y}})) +
+    geom_point(aes(size = {{y}})) +
+    geom_point(data = dt[x > 100, env = list(x = as.character(substitute(x)))],
+               colour = "red")
+
+  ggplotly(plotAge)
+}
