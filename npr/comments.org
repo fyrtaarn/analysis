@@ -1,6 +1,6 @@
 #+title: Kommentar til datasettet
 * Definisjon
-[[https://www.helsedirektoratet.no/tema/statistikk-registre-og-rapporter/helsedata-og-helseregistre/norsk-pasientregister-npr/innhold-og-kvalitet-i-npr][Kodeverk og variabler fra HDir]]
+Hentet fra [[https://www.helsedirektoratet.no/tema/statistikk-registre-og-rapporter/helsedata-og-helseregistre/norsk-pasientregister-npr/innhold-og-kvalitet-i-npr][Kodeverk og variabler fra HDir]]
 
 ** Episode
 - Tidsperiode hvor pasienten får helsehjelp ved én og samme helseinstitusjon for ett og samme helseproblem.
