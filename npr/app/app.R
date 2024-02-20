@@ -1,6 +1,6 @@
 library(shiny)
 library(data.table)
-library(rlang)
+
 # 
 # froot <- "f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_"
 # ffile <- file.path(froot, "Data/Kodebok_Skader_i_Norge.csv")

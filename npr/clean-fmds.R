@@ -1,6 +1,10 @@
 
 # FMDS
 # -----
+root <- "~/Git-fhi/analysis/npr"
+source(file.path(root, "setup.R"))
+source(file.path(root, "functions.R"))
+
 ## fmds <- fread("Data/02_extracted/23_31310_fmds_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(fmds, "./Data/fmds2023des.fst")
 

@@ -21,7 +21,7 @@ kb[variabel == "helseregion"]
 kb[variabel %like% "Mekanisme"]
 kb[variabel %like% "Haste"]
 kb[variabel %like% "^Org.nr"]
-
+kb[variabel %like% "arbeidsgiver"]
 
 ## -------------
 ## Restructuring
