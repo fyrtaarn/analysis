@@ -1,6 +1,10 @@
 
 # Somatic
 # --------------
+root <- "~/Git-fhi/analysis/npr"
+source(file.path(root, "setup.R"))
+source(file.path(root, "functions.R"))
+
 ## som <- fread("Data/02_extracted/23_31310_som_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(som, "./Data/som2023des.fst")
 DT1 <- fst::read_fst("./Data/som2023des.fst", as.data.table = TRUE)
@@ -23,3 +27,15 @@ dt1[Hastegrad == 1, ]
 
 # Leggetid - bruk innDato og utDato
 dt1[, liggetid := as.numeric(difftime(utDato, innDato, units = "days"))]
+
+# Johan spørsmål om antall
+# pasienter med bare en eller flere bidiagnoser S00-T78 i 2022
+som2022 <- dt1[lubridate::year(innDato) == 2022, ]
+som2022[hovdiag == 0 & bidiag == 1, .N]
+som2022[hovdiag == 0 & bidiag == 1, ]
+
+som2022[hovdiag == 0 & bidiag == 1, ][!duplicated(lopenr), .N]
+som2022[hovdiag == 0 & bidiag == 1, ][!duplicated(lopenr), ]
+
+som2022[hovdiag == 0 & bidiag == 1, ][!duplicated(lopenr) & Hastegrad == 1, .N]
+som2022[hovdiag == 0 & bidiag == 1, ][!duplicated(lopenr) & Hastegrad == 1, ]
