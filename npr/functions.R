@@ -35,7 +35,8 @@ get_valid_codes <- function(dt, select.col, create.col, sep = " "){
 #' @param dt Dataset
 #' @param col Column name for age
 #' @param category How to categorise age into groups eg. seq(1,70, 10, Inf)
-do_agegroup <- function(dt, col, category){
+#' @param new Column name for the age group
+do_agegroup <- function(dt, col, category, new = NULL){
   AGEGP <- grp <- ageGRP <- up <- lo <- NULL
 
   if(!is(dt,"data.table"))
@@ -67,7 +68,12 @@ do_agegroup <- function(dt, col, category){
   data.table::setkeyv(DT, col)
   data.table::setkey(KB, AGEGP)
 
-  DT[KB, GRP := GRP][]
+  DT[KB, GRP := GRP]
+
+  if (!is.null(new))
+    data.table::setnames(DT, "GRP", new)
+
+  return(DT[])
 }
 
 
