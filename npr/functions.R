@@ -80,3 +80,25 @@ plot_dots <- function(dt, x, y){
 
   ggplotly(plotAge)
 }
+
+#' Calculate frequency and percent for selected variable
+#' @param data Dataset
+#' @param var Selected variable name to be calculated
+#' @param code Codebook to define the value in variable if needed. Default is NULL
+show_pro <- function(data, var, code = NULL){
+  dt <- data.table::copy(data)
+  x <- dt[, .N, by = var, env = list(var = var)]
+  x[, sum := sum(N, na.rm = T)][, pro := round(100 * N/sum, 1), by = var, env = list(var = var)][, sum := NULL]
+
+  if (!is.null(code)) {
+    if (!is.character(x[, var, env = list(var = var)]))
+      x[, (var) := as.character(kj), env = list(kj = var)]
+
+    data.table::setkeyv(x, var)
+    data.table::setkey(code, kode)
+
+    x[code[variabel == var], beskrivelse := beskrivelse]
+  }
+
+  x[order(var), env = list(var = var)][]
+}
