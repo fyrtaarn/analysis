@@ -1,0 +1,19 @@
+#+title: Møte i arbeidsgruppe
+#+date: 22.02.2024
+
+* Hendelse
+- Personskadedata [[https://www.helsedirektoratet.no/rapporter/personskadedata-2022/kompletthet][rapport 2022]]:
+  Ved sammenligning av aktivitet med somatikkdata telles kun de tilfellene der skaden og det akutte besøket på sykehus/legevakt skjer på samme dag.
+- Skadetilfelle fra personskade rapport:
+  - Hoveddiagnosekode S00 - T78
+  - Bruk unik dato og hoveddiagnosekode på tretegnsnivå
+  - Hastegrad skal være akutt
+- Eksample finnes [[file:scratch/dirty-somatic.R::Episoder][her]].
+* Fødselsdato
+
+* Feilverdig
+- Hva betyr det?
+
+* Johan spørsmål
+- Hvor mange pasienter er det hvert år som får en eller flere bidiagnoser i kapital XIX S00-T78?
+- Tall for 2022 finnes [[file:clean-somatic.R::Johan spørsmål om antall][her]].
