@@ -1,6 +1,5 @@
 #+title: Møte i arbeidsgruppe
 #+date: 22.02.2024
-
 * Hendelse
 - Personskadedata [[https://www.helsedirektoratet.no/rapporter/personskadedata-2022/kompletthet][rapport 2022]]:
   Ved sammenligning av aktivitet med somatikkdata telles kun de tilfellene der skaden og det akutte besøket på sykehus/legevakt skjer på samme dag.
