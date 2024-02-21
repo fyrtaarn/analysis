@@ -7,12 +7,26 @@
   - Hoveddiagnosekode S00 - T78
   - Bruk unik dato og hoveddiagnosekode på tretegnsnivå
   - Hastegrad skal være akutt
-- Eksample finnes [[file:scratch/dirty-somatic.R::Episoder][her]].
-* Fødselsdato
-
+- Eksample finnes [[file:arbeidsgruppe.R::Setup][her]].
+** NPR definisjon 2022
+- 336 544 behandlede skadetilfeller med en skadediagnose. Referanse fra [[https://www.helsedirektoratet.no/rapporter/personskadedata-2022/sammendrag][rapporten]].
+- Vi har mange =NA= eller missing =lopenr= pga. ugyldig fødselsnummer og de som har reservert seg mot utleveringer av forskningsopplysninger i KPR.
+** Antall dager
+- Bør det være grense?
+* Fødselsdato og alder
+Skal beregnes ved å benytte fødselsår og skadedato. Det finnes to fødselsår i
+datasettet dvs. =fodtAar_FMDS= og =fodtAar=. Den siste er renset mot
+folkeregisteret, men inneholder mange =NA= når det ikke er mulig å koble. Men
+vasket versjon inneholder også feil i tillegg til mange missing. Koden er [[file:dirty-fmds.R::Alder][her]].
 * Feilverdig
-- Hva betyr det?
+- Hva betyr det? f.eks =fremkomstmiddel=
+- Eksample finnes [[file:arbeidsgruppe.R::Feil rapportert verdi][her]].
+* Indikatorer
+- Noen resultater fra FMDS er [[file:indikator.R::Indikatorer][her]].
+
+* Kodebok
+- Finnes på denne url [[https://shiny.fhi-api.com/users/ybk/public/codebook/][https://shiny.fhi-api.com/users/ybk/public/codebook/]]
 
 * Johan spørsmål
 - Hvor mange pasienter er det hvert år som får en eller flere bidiagnoser i kapital XIX S00-T78?
-- Tall for 2022 finnes [[file:clean-somatic.R::Johan spørsmål om antall][her]].
+- Tall for 2022 finnes [[file:arbeidsgruppe.R::Johan spørsmål om antall][her]].

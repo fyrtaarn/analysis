@@ -1,4 +1,4 @@
-
+## Indikatorer
 root <- "~/Git-fhi/analysis/npr"
 source(file.path(root, "setup.R"))
 source(file.path(root, "functions.R"))
