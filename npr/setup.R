@@ -6,7 +6,7 @@ pkg <- c("pacman","data.table", "fst", "lubridate", "ggplot2", "plotly")
 kh_load(char = pkg)
 
 root <- "~/Git-fhi/analysis/npr"
-source(file.path(root, "functions.R"))
+source(file.path(root, "./functions/utils.R"))
 
 # Encoding solution with some modification from
 # https://github.com/StoXProject/RstoxData/issues/10#issuecomment-510542301

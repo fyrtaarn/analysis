@@ -1,7 +1,7 @@
 # Setup
 root <- "~/Git-fhi/analysis/npr"
 source(file.path(root, "setup.R"))
-source(file.path(root, "functions.R"))
+source(file.path(root, "./functions/utils.R"))
 source(file.path(root, "clean-fmds.R"))
 kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 
@@ -54,7 +54,6 @@ d3[lopenr == 71513]
 d3[lopenr == 94874]
 
 # Finnes det på FMDS 2022 ----------------------------
-source("clean-fmds.R")
 fdt <- dt2[lubridate::year(skadeDato) == 2022, ]
 
 fdt[lopenr == 202036] #S711 - bare en i FMDS mens to episoder i NPR
@@ -71,6 +70,10 @@ f5 <- fdt[lopenr %in% lnr5$lopenr, .N, by = lopenr]
 f5[N == 3]
 fdt[lopenr == 71513]
 fdt[lopenr == 94874]
+
+# Hendelse FMDS
+fdt[lopenr == 11947] #Hvilken skal slettes?
+
 
 # Feil rapportert verdi
 show_pro(dt2, "fremkomstmiddel", kb)
