@@ -5,6 +5,8 @@
 #' @param select.col Columnames from dataset
 #' @param create.col New columnames to be created
 #' @param sep Separate symbols
+#' @examples
+#' d1 <- get_valid_codes(dt = dd, "hoveddiagnoser", "hovdiag")
 get_valid_codes <- function(dt, select.col, create.col, sep = " "){
 
   if (!("lnr" %in% names(dt))){
@@ -36,6 +38,8 @@ get_valid_codes <- function(dt, select.col, create.col, sep = " "){
 #' @param col Column name for age
 #' @param category How to categorise age into groups eg. seq(1,70, 10, Inf)
 #' @param new Column name for the age group
+#' @examples
+#' dt2 <- do_agegroup(dt2, "age", c(0, 18, 25, 45, 65, Inf))
 do_agegroup <- function(dt, col, category, new = NULL){
   AGEGP <- grp <- ageGRP <- up <- lo <- NULL
 
