@@ -1,6 +1,6 @@
 #+title: Møte i arbeidsgruppe
 #+date: 22.02.2024
-* Hendelse
+* Hendelse - NPR
 - Personskadedata [[https://www.helsedirektoratet.no/rapporter/personskadedata-2022/kompletthet][rapport 2022]]:
   Ved sammenligning av aktivitet med somatikkdata telles kun de tilfellene der skaden og det akutte besøket på sykehus/legevakt skjer på samme dag.
 - Skadetilfelle fra personskade rapport:
@@ -13,6 +13,8 @@
 - Vi har mange =NA= eller missing =lopenr= pga. ugyldig fødselsnummer og de som har reservert seg mot utleveringer av forskningsopplysninger i KPR.
 ** Antall dager
 - Bør det være grense?
+* Hendelse - FMDS
+- Hvilken skal slettes? Se koden [[file:arbeidsgruppe.R::Hendelse FMDS][her]]
 * Fødselsdato og alder
 Skal beregnes ved å benytte fødselsår og skadedato. Det finnes to fødselsår i
 datasettet dvs. =fodtAar_FMDS= og =fodtAar=. Den siste er renset mot
