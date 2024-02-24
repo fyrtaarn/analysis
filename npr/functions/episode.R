@@ -7,15 +7,18 @@
 #' @param period Representing 4-months period ie. first, second or third.
 #'   Default is 0 to include data for the whole period else use 1, 2 or 3.
 #' @param date.col Columname for date for filtering
-#' @param acute Default is 1. To select all use 2
+#' @param acute Default is `FALSE`. Use `TRUE` to include only acute patients ie. Hastegrad = 1
 #' @param days If diffence in days should be considered ie. when a person has
 #'   more than one registered injuries of the same ICD-10 code
 #' @param diag.col Columname of codes for main diagnosis
+#' @examples
+#' dd <- find_episode(dt1, year = 2022, period = 1:2, acute = TRUE)
 
-find_episode <- function(d, year, period = 0, date.col = "innDato",
-                         acute = 1,
-                      days = 0,
-                      diag.col = "hoveddiagnoser"){
+find_episode <- function(d, year, period = 0,
+                         date.col = "innDato",
+                         acute = FALSE,
+                         days = 0,
+                         diag.col = "hoveddiagnoser"){
 
   # Keep dummy columns with prefix "d." for deletion
   d.cols <- NULL
@@ -27,17 +30,21 @@ find_episode <- function(d, year, period = 0, date.col = "innDato",
     d.cols <- append(d.cols, "d.year")
   }
 
-  if (period != 0){
+  if (any(period %in% 1:3)){
     d[, d.month := lubridate::month(x), env = list(x = date.col)]
-    d <- d[d.month %in% period]
-    d.cols <- append(d.cols, "d.month")
+    d[, d.tertial := data.table::fcase(d.month %in% 1:4, 1,
+                                       d.month %in% 5:8, 2,
+                                      d.month %in% 9:12, 3)]
+
+    d <- d[d.tertial %in% period]
+    d.cols <- append(d.cols, c("d.month", "d.tertial"))
   }
 
   ## Include only codes S00 - T78 as main diagnosis
   d <- get_valid_codes(d = d, "hoveddiagnoser", "hovdiag")
   d <- d[hovdiag == 1]
 
-  if (acute == 1)
+  if (acute)
     d <- d[Hastegrad == 1]
 
   # Get difference in days from previous to the following injuries when multiple injuries
