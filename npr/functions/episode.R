@@ -41,7 +41,7 @@ find_episode <- function(d, year, period = 0,
   }
 
   ## Include only codes S00 - T78 as main diagnosis
-  d <- get_valid_codes(d = d, "hoveddiagnoser", "hovdiag")
+  d <- get_valid_codes(d = d, diag.col, "hovdiag")
   d <- d[hovdiag == 1]
 
   if (acute)
@@ -50,9 +50,28 @@ find_episode <- function(d, year, period = 0,
   # Get difference in days from previous to the following injuries when multiple injuries
   if (days != 0){
     d[, days := x - shift(x, type = "lag"), by = lopenr, env = list(x = date.col)]
+    d <- check_codes(d = d, id = "lopenr", col = diag.col, cond = days)
   }
 
   # Dummy columns with  prefix "d."
   d[, (d.cols) := NULL][]
 
 }
+
+
+#' Find similar codes for selected period
+#' @param d Dataset
+#' @param id Unque id
+#' @param col Column name for codes selection
+#' @param cond Condition for selection eg. 3 or 5 days
+#' @examples
+#' dj <- check_codes(dx, "lopenr", "hoveddiagnoser", 3)
+check_codes <- function(d, id, col, cond){
+  d[, dx := data.table::shift(x), by = y, env = list(x = col, y = id)]
+  d[, case := data.table::fifelse(days == 3 & x == dx, 1, 0), by = y, env = list(x = col, y = id)]
+  d[, dx := NULL]
+}
+
+#OBS!! What happen when hoveddiagnoser has more than one codes??
+# - All codes must exist in the following episode?
+# - At least one exists in the following episode?
