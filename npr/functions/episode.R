@@ -69,7 +69,9 @@ find_episode <- function(d, year, period = 0,
 #' dj <- check_codes(dx, "lopenr", "hoveddiagnoser", 3)
 check_codes <- function(d, id, col, cond){
   d[, dx := data.table::shift(x), by = y, env = list(x = col, y = id)]
-  d[, case := data.table::fifelse(days == 3 & x == dx, 1, 0), by = y, env = list(x = col, y = id)]
+  d[, case := data.table::fifelse(days <= dag & x == dx, 1, 0), by = y,
+    env = list(dag = cond, x = col, y = id)]
+
   d[, dx := NULL]
 }
 
