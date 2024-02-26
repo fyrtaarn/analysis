@@ -13,6 +13,7 @@
 #' @param diag.col Columname of codes for main diagnosis
 #' @examples
 #' dd <- find_episode(dt1, year = 2022, period = 1:2, acute = TRUE)
+#' dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
 
 find_episode <- function(d, year, period = 0,
                          date.col = "innDato",
