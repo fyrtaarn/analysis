@@ -1,4 +1,4 @@
-#' Define injury case or episode. Generally an episode shoulde be:
+#' Define injury dup or episode. Generally an episode shoulde be:
 #' - Main diagnosis is between S00 to T78
 #' - It's an acute injury ie. hastegrad is 1
 #' - Posibility to select days from previous to the following injury of similar code for multiple injuries
@@ -33,7 +33,7 @@ find_episode <- function(d, year, period = 0,
 
   if (any(period %in% 1:3)){
     d[, d.month := lubridate::month(x), env = list(x = date.col)]
-    d[, d.tertial := data.table::fcase(d.month %in% 1:4, 1,
+    d[, d.tertial := data.table::fdup(d.month %in% 1:4, 1,
                                        d.month %in% 5:8, 2,
                                       d.month %in% 9:12, 3)]
 
@@ -60,7 +60,9 @@ find_episode <- function(d, year, period = 0,
 }
 
 
-#' Find similar codes for selected period
+#' Find similar codes for a chosen period to avoid counting similar injury more than once.
+#' Column `dup` with value 1 represents possibility of similar injury. The rows should
+#' be carefully evaluated or deleted.
 #' @param d Dataset
 #' @param id Unque id
 #' @param col Column name for codes selection
@@ -69,7 +71,7 @@ find_episode <- function(d, year, period = 0,
 #' dj <- check_codes(dx, "lopenr", "hoveddiagnoser", 3)
 check_codes <- function(d, id, col, cond){
   d[, dx := data.table::shift(x), by = y, env = list(x = col, y = id)]
-  d[, case := data.table::fifelse(days <= dag & x == dx, 1, 0), by = y,
+  d[, dup := data.table::fifelse(days <= dag & x == dx, 1, 0), by = y,
     env = list(dag = cond, x = col, y = id)]
 
   d[, dx := NULL]

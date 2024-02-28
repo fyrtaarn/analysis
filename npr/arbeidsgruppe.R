@@ -78,6 +78,9 @@ fdt[lopenr == 11947] #Hvilken skal slettes?
 # Feil rapportert verdi
 show_pro(dt2, "fremkomstmiddel", kb)
 
+# Valg av episoder
+dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
+
 
 # Johan spørsmål om antall
 # pasienter med bare en eller flere bidiagnoser S00-T78 i 2022
