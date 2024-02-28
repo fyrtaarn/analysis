@@ -15,19 +15,19 @@ dt1[, lnr := 1:.N] # linenumber
 dt1[is.na(lopenr), .N]
 dt1 <- dt1[!is.na(lopenr)]
 
-## Bare for 2022
+## Bare for 2022 ------
 dd <- dt1[lubridate::year(innDato) == 2022, ]
 
 (opp <- dd[, .(count =.N), by = lopenr][order(count)])
 
-## S00 - T78
+## S00 - T78 --------
 d1 <- get_valid_codes(dt = dd, "hoveddiagnoser", "hovdiag")
 
 show_pro(d1, "hovdiag")
 
 d2 <- d1[hovdiag == 1]
 
-## Hastegrad 1
+## Hastegrad 1 --------
 show_pro(d2, "Hastegrad", kb) # 336 544 i rapporten fra 2022
 d3 <- d2[Hastegrad == 1]
 
@@ -79,9 +79,12 @@ fdt[lopenr == 11947] #Hvilken skal slettes?
 show_pro(dt2, "fremkomstmiddel", kb)
 
 # Valg av episoder
-dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
+dd <- find_episode(dt2, year = 2022, acute = TRUE, days = 3)
 
+dd[lopenr == 164629] #example
+dd[lopenr == 879285]
 
+## ---------------------------------
 # Johan spørsmål om antall
 # pasienter med bare en eller flere bidiagnoser S00-T78 i 2022
 dj <- get_valid_codes(dt = d1, "bidiagnoser", "bidiag", sep = " ")

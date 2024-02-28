@@ -22,6 +22,8 @@ do_encode <- function(x) gsub("Ã¦", "æ", useBytes = TRUE,
 
 kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 # kb[variabel %like% "^Org"][beskrivelse %like% "OUS"][, .(beskrivelse, kode)]
+
+# helseforetak_nr og behandlingsstedKode
 sykehus <- c(
   974795639, #UNN Harstad
   974795787, #UNN Tromsø
