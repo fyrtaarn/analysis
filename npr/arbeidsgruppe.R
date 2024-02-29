@@ -21,37 +21,37 @@ dd <- dt1[lubridate::year(innDato) == 2022, ]
 (opp <- dd[, .(count =.N), by = lopenr][order(count)])
 
 ## S00 - T78 --------
-d1 <- get_valid_codes(dt = dd, "hoveddiagnoser", "hovdiag")
+dx1 <- get_valid_codes(dt = dd, "hoveddiagnoser", "hovdiag")
 
-show_pro(d1, "hovdiag")
+show_pro(dx1, "hovdiag")
 
-d2 <- d1[hovdiag == 1]
+dx2 <- dx1[hovdiag == 1]
 
 ## Hastegrad 1 --------
-show_pro(d2, "Hastegrad", kb) # 336 544 i rapporten fra 2022
-d3 <- d2[Hastegrad == 1]
+show_pro(dx2, "Hastegrad", kb) # 336 544 i rapporten fra 2022
+dx3 <- dx2[Hastegrad == 1]
 
-(opp1 <- d3[, .(count =.N), by = lopenr][order(count)])
+(opp1 <- dx3[, .(count =.N), by = lopenr][order(count)])
 
 # x1 <- opp1[count == 6,]$lopenr
-# d3[dager %between% c(3,5), ][lopenr %in% x1, .(lopenr)]
-d3[lopenr == 935970] #
-d3[lopenr == 553390] #
+# dx3[dager %between% c(3,5), ][lopenr %in% x1, .(lopenr)]
+dx3[lopenr == 935970] #
+dx3[lopenr == 553390] #
 
 # Forskjeller i dager fra forriger hendelse til den neste
-d3[, dager := innDato - shift(innDato, type = "lag"), by = lopenr]
-(lnr3 <- d3[dager == 3][!duplicated(lopenr), .(lopenr)])
+dx3[, dager := innDato - shift(innDato, type = "lag"), by = lopenr]
+(lnr3 <- dx3[dager == 3][!duplicated(lopenr), .(lopenr)])
 
-d3[lopenr == 75421]
-d3[lopenr == 111537]
+dx3[lopenr == 75421]
+dx3[lopenr == 111537]
 
-d3[lopenr == 423869] #like S662 - ingen FMDS
-d3[lopenr == 202036] #like S711 - en i FMDS
-d3[lopenr == 503386] #2 forskjellige koder - ingen FMDS
+dx3[lopenr == 423869] #like S662 - ingen FMDS
+dx3[lopenr == 202036] #like S711 - en i FMDS
+dx3[lopenr == 503386] #2 forskjellige koder - ingen FMDS
 
-( lnr5 <- d3[dager == 5][!duplicated(lopenr), .(lopenr)] )
-d3[lopenr == 71513]
-d3[lopenr == 94874]
+( lnr5 <- dx3[dager == 5][!duplicated(lopenr), .(lopenr)] )
+dx3[lopenr == 71513]
+dx3[lopenr == 94874]
 
 # Finnes det på FMDS 2022 ----------------------------
 fdt <- dt2[lubridate::year(skadeDato) == 2022, ]
@@ -76,10 +76,11 @@ fdt[lopenr == 11947] #Hvilken skal slettes?
 
 
 # Feil rapportert verdi
+source(file.path(root, "clean-fmds.R"))
 show_pro(dt2, "fremkomstmiddel", kb)
 
 # Valg av episoder
-dd <- find_episode(dt2, year = 2022, acute = TRUE, days = 3)
+dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
 
 dd[lopenr == 164629] #example
 dd[lopenr == 879285]
@@ -87,7 +88,7 @@ dd[lopenr == 879285]
 ## ---------------------------------
 # Johan spørsmål om antall
 # pasienter med bare en eller flere bidiagnoser S00-T78 i 2022
-dj <- get_valid_codes(dt = d1, "bidiagnoser", "bidiag", sep = " ")
+dj <- get_valid_codes(dt = dx1, "bidiagnoser", "bidiag", sep = " ")
 
 dj[hovdiag == 0 & bidiag == 1, .N]
 dj[hovdiag == 0 & bidiag == 1, ]
