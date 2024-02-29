@@ -33,9 +33,9 @@ find_episode <- function(d, year, period = 0,
 
   if (any(period %in% 1:3)){
     d[, d.month := lubridate::month(x), env = list(x = date.col)]
-    d[, d.tertial := data.table::fdup(d.month %in% 1:4, 1,
+    d[, d.tertial := data.table::fcase(d.month %in% 1:4, 1,
                                        d.month %in% 5:8, 2,
-                                      d.month %in% 9:12, 3)]
+                                       d.month %in% 9:12, 3)]
 
     d <- d[d.tertial %in% period]
     d.cols <- append(d.cols, c("d.month", "d.tertial"))
