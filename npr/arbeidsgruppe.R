@@ -1,9 +1,7 @@
 # Setup
 root <- "~/Git-fhi/analysis/npr"
 source(file.path(root, "setup.R"))
-source(file.path(root, "./functions/utils.R"))
 source(file.path(root, "clean-fmds.R"))
-kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 
 # Hendelser / episoder ---------------------
 DT1 <- fst::read_fst("./Data/som2023des.fst", as.data.table = TRUE)
