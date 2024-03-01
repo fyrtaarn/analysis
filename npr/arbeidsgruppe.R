@@ -7,7 +7,7 @@ source(file.path(root, "clean-fmds.R"))
 DT1 <- fst::read_fst("./Data/som2023des.fst", as.data.table = TRUE)
 
 dt1 <- DT1[!duplicated(DT1)] # slett duplikater
-dt1 <- dt1[order(innDato, lopenr)] #sort
+setkey(dt1, lopenr, innDato)
 dt1[, lnr := 1:.N] # linenumber
 
 dt1[is.na(lopenr), .N]
