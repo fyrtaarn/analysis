@@ -1,48 +1,53 @@
 ## Functions to use
 
-#' Split columns with multiple input
-#' @param dt Dataset
-#' @param select.col Columnames from dataset
-#' @param create.col New columnames to be created
-#' @param sep Separate symbols
+#' Select codes from column consisting ICD-10 codes that meet the requirement for injury codes ie. between S00 to T78
+#' @param d Dataset
+#' @param select.col Columnames from dataset with ICD codes to be controlled for
+#' @param create.col New columnames consisting logical value to indicate that at least one
+#' of these codes S00 to T78 exists ie. TRUE means one or more of the codes in `select.col`
+#' is between S00 to T78
+#' @param split Symbols for splitting the codes when there are multiple codes in the column
 #' @examples
 #' d1 <- get_valid_codes(dt = dd, "hoveddiagnoser", "hovdiag")
-get_valid_codes <- function(dt, select.col, create.col, sep = " "){
+get_valid_codes <- function(d, select.col, create.col, split = " "){
 
-  if (!("lnr" %in% names(dt))){
-    dt1[, lnr := 1:.N] # linenumber
+  dx <- data.table::copy(d)
+
+  # Linenumber is needed for couting ICD codes by line
+  if (!("lnr" %in% names(dx))){
+    dx[, lnr := 1:.N] # linenumber
   }
 
-  dt[, colnr := length(unlist(strsplit(col1, sep))), by = lnr, env = list(col1 = select.col)]
+  dx[, colnr := length(unlist(strsplit(x = col1, split = split))), by = lnr, env = list(col1 = select.col)]
+  cols <- paste0("temp", 1:max(dx$colnr))
+  dx[, (cols) := data.table::tstrsplit(x = col1, " "), env = list(col1 = select.col)]
 
-  cols <- paste0("temp", 1:max(dt$colnr))
-  dt[, (cols) := data.table::tstrsplit(col1, " "), env = list(col1 = select.col)]
-
-  # Only these codes S00 til T78
+  # Select only these codes S00 til T78
   codeURL <- "https://github.com/fyrtaarn/analysis/raw/main/data/validCodes.RDS"
   codes <- readRDS(url(codeURL))
 
   for (j in cols){
-    if(class(dt[[j]]) == 'character')
-      set(dt, j = j, value = substr(dt[[j]], 1, 3) %chin% codes)
+    if(class(dx[[j]]) == 'character')
+      set(dx, j = j, value = substr(dx[[j]], 1, 3) %chin% codes)
   }
 
-  dt[ , (create.col) := rowSums(.SD) > 0, .SDcols = cols]
+  dx[ , (create.col) := rowSums(.SD) > 0, .SDcols = cols]
   xcols <- c("colnr", cols)
-  dt[, (xcols) := NULL][]
+  dx[, (xcols) := NULL][]
 }
 
 
 #' Recode age into groups
-#' @param dt Dataset
+#' @param d Dataset
 #' @param col Column name for age
 #' @param category How to categorise age into groups eg. seq(1,70, 10, Inf)
 #' @param new Column name for the age group
 #' @examples
 #' dt2 <- do_agegroup(dt2, "age", c(0, 18, 25, 45, 65, Inf))
-do_agegroup <- function(dt, col, category, new = NULL){
+do_agegroup <- function(d, col, category, new = NULL){
   AGEGP <- grp <- ageGRP <- up <- lo <- NULL
 
+  dt <- data.table::copy(d)
   if(!is(dt,"data.table"))
     data.table::setDT(dt)
 
