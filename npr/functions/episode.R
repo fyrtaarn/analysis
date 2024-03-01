@@ -59,7 +59,7 @@ find_episode <- function(d, year, period = 0,
   # Get difference in days from previous to the following injuries when
   # multiple injuries are registered
   if (days != 0){
-    d[, days := x - shift(x, type = "lag"), by = lopenr, env = list(x = date.col)]
+    d[, days := x - data.table::shift(x, type = "lag"), by = lopenr, env = list(x = date.col)]
     d <- check_codes(d = d, id = "lopenr", col = diag.col, cond = days)
   }
 
