@@ -7,6 +7,7 @@
 #' @param period Representing 4-months period ie. first, second or third.
 #'   Default is 0 to include data for the whole period else use 1, 2 or 3.
 #' @param date.col Columname for date for filtering
+#' @param id Columname representing unique id
 #' @param acute Default is `FALSE`. Use `TRUE` to include only acute patients ie. Hastegrad = 1
 #' @param days If diffence in days should be considered ie. when a person has
 #'   more than one registered injuries of the same ICD-10 code
@@ -16,13 +17,20 @@
 #' dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
 
 find_episode <- function(d, year, period = 0,
+                         id = "lopenr",
                          date.col = "innDato",
                          acute = FALSE,
                          days = 0,
                          diag.col = "hoveddiagnoser"){
 
+  d <- data.table::copy(d)
+
   # Keep dummy columns with prefix "d." for deletion
   d.cols <- NULL
+
+  # Cleaning and restructuring
+  d <- unique(d)
+  data.table::setkeyv(d, c(id, date.col))
 
   # Create dummy year for filtering
   if (!missing(year)){
@@ -42,13 +50,14 @@ find_episode <- function(d, year, period = 0,
   }
 
   ## Include only codes S00 - T78 as main diagnosis
-  d <- get_valid_codes(d = d, diag.col, "hovdiag")
+  d <- get_valid_codes(d = d, diag.col, "hovdiag", split = " ")
   d <- d[hovdiag == 1]
 
   if (acute)
     d <- d[Hastegrad == 1]
 
-  # Get difference in days from previous to the following injuries when multiple injuries
+  # Get difference in days from previous to the following injuries when
+  # multiple injuries are registered
   if (days != 0){
     d[, days := x - shift(x, type = "lag"), by = lopenr, env = list(x = date.col)]
     d <- check_codes(d = d, id = "lopenr", col = diag.col, cond = days)
@@ -80,3 +89,4 @@ check_codes <- function(d, id, col, cond){
 #OBS!! What happen when hoveddiagnoser has more than one codes??
 # - All codes must exist in the following episode?
 # - At least one exists in the following episode?
+# Current solution requires the previous and following must all be equal
