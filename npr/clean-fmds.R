@@ -14,7 +14,7 @@ DT2[, helseforetak_Navn := do_encode(helseforetak_Navn)]
 # Delete duplikater
 dt2 <- unique(DT2)
 
-dt2 <- dt2[order(lopenr, skadeDato,)] #sort
+setkey(dt2, lopenr, skadeDato, skadeTid)
 dt2[, lnr := 1:.N] # linenumber
 # Create a dummy var for merging
 dt2[, mergeVar := skadeDato]

@@ -12,7 +12,7 @@ DT1 <- fst::read_fst("./Data/som2023des.fst", as.data.table = TRUE)
 # Delete duplikater
 dt1 <- DT1[!duplicated(DT1)]
 
-dt1 <- dt1[order(innDato, lopenr)] #sort
+setkey(dt1, lopenr, innDato)
 dt1[, lnr := 1:.N] # linenumber
 # Create a dummy var for merging
 dt1[, mergeVar := innDato]
