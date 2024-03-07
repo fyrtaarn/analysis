@@ -108,13 +108,15 @@ show_pro <- function(data, var, code = NULL){
   x <- dt[, .N, by = var, env = list(var = var)]
   x[, sum := sum(N, na.rm = T)][, pro := round(100 * N/sum, 1), by = var, env = list(var = var)][, sum := NULL]
 
-  data.table::setkeyv(x, var)
   if (!is.null(code)) {
     if (!is.character(x[, var, env = list(var = var)]))
       x[, (var) := as.character(kj), env = list(kj = var)]
 
+    data.table::setkeyv(x, var)
     data.table::setkey(code, kode)
     x[code[variabel == var], beskrivelse := beskrivelse]
+  } else {
+    data.table::setkeyv(x, var)
   }
 
   return(x[])
