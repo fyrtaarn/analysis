@@ -18,4 +18,4 @@ setkey(dt2, lopenr, skadeDato, skadeTid)
 dt2[, lnr := 1:.N] # linenumber
 # Create a dummy var for merging
 dt2[, mergeVar := skadeDato]
-dt2
+# dt2

@@ -19,8 +19,8 @@ dt1[, mergeVar := innDato]
 
 # Hoved- og bidiagnoser
 ## Hvilke av cases som er gylding dvs S00 til T78 som hoveddiagnose og bidiagnose
-dt1 <- get_valid_codes(dt = dt1, "hoveddiagnoser", "hovdiag")
-dt1 <- get_valid_codes(dt = dt1, "bidiagnoser", "bidiag", sep = " ")
+dt1 <- get_valid_codes(d = dt1, "hoveddiagnoser", "hovdiag")
+dt1 <- get_valid_codes(d = dt1, "bidiagnoser", "bidiag", split = " ")
 
 # Select only acute patient ie. Hastegrad = 1
 dt1[Hastegrad == 1, ]
