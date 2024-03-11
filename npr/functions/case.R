@@ -10,7 +10,10 @@
 #' @param verbose Show the steps
 #' @param clean Delete all the possible duplicated cases
 #' @return A dataset with a DELXX column to indicate non-cases with value 1 if argument `clean = FALSE`
-find_case <- function(d1, d2, id, skade, rhf,
+find_case <- function(d1, d2,
+                      id = "lopenr",
+                      skade = "skadeDato",
+                      rhf = "helseforetak_nr",
                       suffix = 1,
                       filter = NULL,
                       days = 3,
