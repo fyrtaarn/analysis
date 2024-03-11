@@ -8,11 +8,28 @@
 #' @param filter Column name for filtering inclusion and exclusion ie. `is.na(filter)`
 #' @param days A selected time period to consider as similar injury eg. 3 days
 #' @param verbose Show the steps
-#' @return A dataset with a DELXX column to indicate non-cases with value 1
-find_case <- function(d1, d2, id, skade, rhf, suffix = 1, filter = NULL, days = 3, verbose = FALSE ){
+#' @param clean Delete all the possible duplicated cases
+#' @return A dataset with a DELXX column to indicate non-cases with value 1 if argument `clean = FALSE`
+find_case <- function(d1, d2, id, skade, rhf,
+                      suffix = 1,
+                      filter = NULL,
+                      days = 3,
+                      verbose = FALSE,
+                      clean = FALSE){
 
-  d <- is_dup_rhf(d = d1, id = id, skade = skade, rhf = rhf, suffix = suffix)
-  d <- is_rhf(d1 = d, d2 = d2, id = id, skade = skade, rhf = rhf, filter = filter, days = days)
+  d <- is_dup_rhf(d = d1,
+                  id = id,
+                  skade = skade,
+                  rhf = rhf,
+                  suffix = suffix)
+
+  d <- is_rhf(d1 = d,
+              d2 = d2,
+              id = id,
+              skade = skade,
+              rhf = rhf,
+              filter = filter,
+              days = days)
 
   d[, DELXX := NA_integer_]
 
@@ -27,7 +44,13 @@ find_case <- function(d1, d2, id, skade, rhf, suffix = 1, filter = NULL, days = 
     d[, (xxCols) := NULL]
   }
 
-  return(d)
+  if (clean){
+    indx <- d[DELXX == 1, which = TRUE]
+    d <- is_delete_index(d, indx)
+    d[, DELXX := NULL]
+  }
+
+  return(d[])
 }
 
 
@@ -81,8 +104,6 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
 
   sufx <- as.integer(gsub("\\D", "", filter)) + 1
   d <- is_dup_rhf(d, id, skade = skade, rhf = rhf, suffix = sufx)
-  ## delCol <- paste0("xx.del", sufx)
-  ## d[, (delCol) := NULL ]
 
   date2 <- paste0("xx.date", sufx)
   xDato <- d[!duplicated(id) & date2 > 1,
