@@ -7,11 +7,27 @@
 #' @param suffix Surfix to be added to colum names for filtering eg. xx.var1
 #' @param filter Column name for filtering inclusion and exclusion ie. `is.na(filter)`
 #' @param days A selected time period to consider as similar injury eg. 3 days
-#' @param verbose
+#' @param verbose Show the steps
+#' @return A dataset with a DELXX column to indicate non-cases with value 1
 find_case <- function(d1, d2, id, skade, rhf, suffix = 1, filter = NULL, days = 3, verbose = FALSE ){
 
   d <- is_dup_rhf(d = d1, id = id, skade = skade, rhf = rhf, suffix = suffix)
   d <- is_rhf(d1 = d, d2 = d2, id = id, skade = skade, rhf = rhf, filter = filter, days = days)
+
+  d[, DELXX := NA_integer_]
+
+  delCols <- grep("^xx.del", names(d), value = TRUE)
+
+  for (i in delCols){
+    d[, DELXX := data.table::fifelse(is.na(DELXX), i, DELXX), env = list(i = i)]
+  }
+
+  if (!verbose){
+    xxCols <- grep("^xx.*", names(d), value = TRUE)
+    d[, (xxCols) := NULL]
+  }
+
+  return(d)
 }
 
 
@@ -32,7 +48,8 @@ is_dup_rhf <- function(d, id, skade, rhf, suffix = 1){
   d[, (xdate) := .N, by = c(id, skade)]
 
   xrhf <- paste0("xx.rhf", suffix)
-  d[xdate > 1, (xrhf) := .N, by = c(id, rhf), env = list(xdate = xdate)]
+  d[xdate > 1, (xrhf) := .N, by = .(id, rhf),
+    env = list(xdate = xdate, id = id, rhf = rhf)]
 
   xdel <- paste0("xx.del", suffix)
   dupRows <- duplicated(d, by = c(id, skade, rhf))
@@ -56,6 +73,8 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
 
   if (is.null(filter))
     filter <- grep("xx.del", names(d1), value = TRUE)
+
+  data.table::setkeyv(d2, c(id, "innDato"))
 
   dx <- d1[!is.na(filter), env = list(filter = filter)]
   d <- d1[is.na(filter), env = list(filter = filter)]
