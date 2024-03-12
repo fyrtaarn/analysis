@@ -114,8 +114,8 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
 
   date2 <- paste0("xx.date", sufx)
   xDato <- d[!duplicated(id) & date2 > 1,
-             .(dateFrom = skade, dateTo = data.table::as.IDate(skade) + days),
-             by = id, env = list(id = id, date2 = date2, skade = skade, days = days)]
+             .(dateFrom = skade, dateTo = data.table::as.IDate(skade) + days), by = id,
+             env = list(id = id, date2 = date2, skade = skade, days = days)]
 
   cols <- c(id, rhf)
   vecRFH <- vector(mode = "list", length = nrow(xDato))
@@ -139,16 +139,20 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
 
   sufDel <- paste0("xx.DEL", sufx)
   idVec <- unique(dtRHF[[id]])
-  for (i in seq_len(length(idVec))){
-    ddx <- dtRHF[[id]][i]
-    datoF <- dtRHF[["dateFrom"]][i]
-    rhfx <- dtRHF[id == ddx, env = list(id = id, ddx = ddx)][[rhf]]
+  for (i in idVec){
+    datoF <- xDato[id == i, env = list(id = id)][["dateFrom"]]
+    datoT <- xDato[id == i, env = list(id = id)][["dateTo"]]
+    rhfx <- dtRHF[id == i, env = list(id = id)][[rhf]]
 
-    d[id == ddx & skade == datoF & !(rhf %in% rhfx), (sufDel) := 1,
-      env = list(id = id, ddx = ddx, skade = skade, datoF = datoF, rhf = rhf, rhfx = rhfx)]
+    ## Identify RHF i FMDS that aren't in somatic within the same selected period
+    d[id == i & skade %between% c(datoF, datoT) & !(rhf %in% rhfx), (sufDel) := 1,
+      env = list(id = id,skade = skade, rhf = rhf)]
   }
 
   DT <- data.table::rbindlist(list(dx, d), fill = TRUE)
   data.table::setkeyv(DT, c(id, skade, "skadeTid"))
   return(DT)
 }
+
+
+## Example for lopenr 4168 with 2 different RHF in 4 registration
