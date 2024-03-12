@@ -4,7 +4,6 @@
 #' @param id Unique patient identity
 #' @param skade Coloumn name for date of injury
 #' @param rhf Coloumn name for health institutions
-#' @param suffix Surfix to be added to colum names for filtering eg. xx.var1
 #' @param filter Column name for filtering inclusion and exclusion ie. `is.na(filter)`
 #' @param days A selected time period to consider as similar injury eg. 3 days
 #' @param verbose Show the steps
@@ -14,17 +13,19 @@ find_case <- function(d1, d2,
                       id = "lopenr",
                       skade = "skadeDato",
                       rhf = "helseforetak_nr",
-                      suffix = 1,
                       filter = NULL,
                       days = 3,
                       verbose = FALSE,
                       clean = FALSE){
 
+  if (clean)
+    verbose = FALSE
+
   d <- is_dup_rhf(d = d1,
                   id = id,
                   skade = skade,
                   rhf = rhf,
-                  suffix = suffix)
+                  suffix = days)
 
   d <- is_rhf(d1 = d,
               d2 = d2,
@@ -34,19 +35,21 @@ find_case <- function(d1, d2,
               filter = filter,
               days = days)
 
-  d[, DELXX := NA_integer_]
+  if (verbose){
+    return(d)
+  } else {
+    d[, DELXX := NA_integer_]
 
-  delCols <- grep("^xx.del", names(d), value = TRUE)
+    delCols <- grep("^xx.DEL", names(d), value = TRUE)
 
-  for (i in delCols){
-    d[, DELXX := data.table::fifelse(is.na(DELXX), i, DELXX), env = list(i = i)]
-  }
+    for (i in delCols){
+      d[, DELXX := data.table::fifelse(is.na(DELXX), i, DELXX), env = list(i = i)]
+    }
 
-  if (!verbose){
     xxCols <- grep("^xx.*", names(d), value = TRUE)
     d[, (xxCols) := NULL]
   }
-
+  
   if (clean){
     indx <- d[DELXX == 1, which = TRUE]
     d <- is_delete_index(d, indx)
@@ -77,7 +80,7 @@ is_dup_rhf <- function(d, id, skade, rhf, suffix = 1){
   d[xdate > 1, (xrhf) := .N, by = .(id, rhf),
     env = list(xdate = xdate, id = id, rhf = rhf)]
 
-  xdel <- paste0("xx.del", suffix)
+  xdel <- paste0("xx.DEL", suffix)
   dupRows <- duplicated(d, by = c(id, skade, rhf))
   d[dupRows, (xdel) := 1][]
 }
@@ -87,7 +90,7 @@ is_dup_rhf <- function(d, id, skade, rhf, suffix = 1){
 #' Need to check with injury register to identify which health institutions
 #' the patients were registered to in NPR. If the health institution in FMDS isn't
 #' similar to those registered in NPR (entry point) within as selected time period
-#' then it's considered double registery. Double registery is marked with 1 in column "xx.del"
+#' then it's considered double registery. Double registery is marked with 1 in column "xx.DEL"
 #' @param d1 Dataset for FMDS ie. external explanation for injury
 #' @param d2 Dataset for NPR ie. intery registration for injury
 #' @param id Unique patient identity
@@ -98,14 +101,15 @@ is_dup_rhf <- function(d, id, skade, rhf, suffix = 1){
 is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
 
   if (is.null(filter))
-    filter <- grep("xx.del", names(d1), value = TRUE)
+    filter <- grep("xx.DEL", names(d1), value = TRUE)
 
   data.table::setkeyv(d2, c(id, "innDato"))
 
   dx <- d1[!is.na(filter), env = list(filter = filter)]
   d <- d1[is.na(filter), env = list(filter = filter)]
 
-  sufx <- as.integer(gsub("\\D", "", filter)) + 1
+  period <- as.integer(gsub("\\D", "", filter))
+  sufx <- (period * 10) + period
   d <- is_dup_rhf(d, id, skade = skade, rhf = rhf, suffix = sufx)
 
   date2 <- paste0("xx.date", sufx)
@@ -133,7 +137,7 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
   colDate <- c("dateFrom", rhf)
   dtRHF[xDato, on = id, (colDate) := mget(colDate), env = list(id = id)]
 
-  sufDel <- paste0("xx.del", sufx)
+  sufDel <- paste0("xx.DEL", sufx)
   idVec <- unique(dtRHF[[id]])
   for (i in seq_len(length(idVec))){
     ddx <- dtRHF[[id]][i]
