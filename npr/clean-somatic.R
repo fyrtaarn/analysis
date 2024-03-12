@@ -1,9 +1,7 @@
 
 # Somatic
 # --------------
-root <- "~/Git-fhi/analysis/npr"
-source(file.path(root, "setup.R"))
-source(file.path(root, "./functions/utils.R"))
+# run file `setup.R` prior using this file
 
 ## som <- fread("Data/02_extracted/23_31310_som_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(som, "./Data/som2023des.fst")
@@ -19,8 +17,8 @@ dt1[, mergeVar := innDato]
 
 # Hoved- og bidiagnoser
 ## Hvilke av cases som er gylding dvs S00 til T78 som hoveddiagnose og bidiagnose
-dt1 <- get_valid_codes(dt = dt1, "hoveddiagnoser", "hovdiag")
-dt1 <- get_valid_codes(dt = dt1, "bidiagnoser", "bidiag", sep = " ")
+dt1 <- get_valid_codes(d = dt1, "hoveddiagnoser", "hovdiag")
+dt1 <- get_valid_codes(d = dt1, "bidiagnoser", "bidiag", split = " ")
 
 # Select only acute patient ie. Hastegrad = 1
 dt1[Hastegrad == 1, ]
