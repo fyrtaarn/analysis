@@ -110,6 +110,12 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
 
   period <- as.integer(gsub("\\D", "", filter))
   sufx <- (period * 10) + period
+
+  if (sufx == 0){
+    ## sufx <- "00"
+    stop("Comparing exact date isn't implemented yet")
+  }
+
   d <- is_dup_rhf(d, id, skade = skade, rhf = rhf, suffix = sufx)
 
   date2 <- paste0("xx.date", sufx)
