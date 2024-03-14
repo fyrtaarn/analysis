@@ -86,7 +86,7 @@ is_dup_rhf <- function(d, id, skade, rhf, suffix = 1){
 
   xdel <- paste0("xx.DEL", suffix)
   dupRows <- duplicated(d, by = c(id, skade, rhf))
-  d[dupRows, (xdel) := 1][]
+  d[dupRows, (xdel) := 1L][]
 }
 
 
@@ -155,7 +155,7 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
     rhfx <- dtRHF[id == i, env = list(id = id)][[rhf]]
 
     ## Identify RHF i FMDS that aren't in somatic within the same selected period
-    d[id == i & skade %between% c(datoF, datoT) & !(rhf %in% rhfx), (sufDel) := 1,
+    d[id == i & skade %between% c(datoF, datoT) & !(rhf %in% rhfx), (sufDel) := 1L,
       env = list(id = id,skade = skade, rhf = rhf)]
   }
 
