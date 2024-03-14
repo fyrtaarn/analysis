@@ -21,19 +21,23 @@ find_case <- function(d1, d2,
   if (clean)
     verbose = FALSE
 
-  d <- is_dup_rhf(d = d1,
-                  id = id,
-                  skade = skade,
-                  rhf = rhf,
-                  suffix = days)
+  if (days == 0){
+    d <- is_same_dates(d1, d2)
+  } else {
+    d <- is_dup_rhf(d = d1,
+                    id = id,
+                    skade = skade,
+                    rhf = rhf,
+                    suffix = days)
 
-  d <- is_rhf(d1 = d,
-              d2 = d2,
-              id = id,
-              skade = skade,
-              rhf = rhf,
-              filter = filter,
-              days = days)
+    d <- is_rhf(d1 = d,
+                d2 = d2,
+                id = id,
+                skade = skade,
+                rhf = rhf,
+                filter = filter,
+                days = days)
+  }
 
   if (verbose){
     return(d)
