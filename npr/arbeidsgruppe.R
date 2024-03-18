@@ -19,7 +19,7 @@ dd <- dt1[lubridate::year(innDato) == 2022, ]
 (opp <- dd[, .(count =.N), by = lopenr][order(count)])
 
 ## S00 - T78 --------
-dx1 <- get_valid_codes(dt = dd, "hoveddiagnoser", "hovdiag")
+dx1 <- get_valid_codes(d = dd, "hoveddiagnoser", "hovdiag")
 
 show_pro(dx1, "hovdiag")
 
