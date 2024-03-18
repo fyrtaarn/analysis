@@ -8,4 +8,4 @@ expect_equal(check_codes(dt.check, "lopenr", "hoveddiagnoser", 3), out.check)
 epiDT <- readRDS("~/Git-fhi/analysis/npr/test-data/days-injury-dt.RDS")
 epiOut <- readRDS("~/Git-fhi/analysis/npr/test-data/days-injury-out.RDS")
 
-expect_equal(find_episode(d=epiDT, year=2022, acute = TRUE, days = 3), epiOut)
+expect_equal(find_episode(d=epiDT, acute = TRUE, days = 3), epiOut)

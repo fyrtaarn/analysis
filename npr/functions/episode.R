@@ -3,7 +3,6 @@
 #' - It's an acute injury ie. hastegrad is 1
 #' - Posibility to select days from previous to the following injury of similar code for multiple injuries
 #' @param d Dataset
-#' @param year Year to select
 #' @param period Representing 4-months period ie. first, second or third.
 #'   Default is 0 to include data for the whole period else use 1, 2 or 3.
 #' @param date.col Columname for date for filtering
@@ -16,7 +15,7 @@
 #' dd <- find_episode(dt1, year = 2022, period = 1:2, acute = TRUE)
 #' dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
 
-find_episode <- function(d, year, period = 0,
+find_episode <- function(d, period = 0,
                          id = "lopenr",
                          date.col = "innDato",
                          acute = FALSE,
@@ -32,12 +31,12 @@ find_episode <- function(d, year, period = 0,
   d <- unique(d)
   data.table::setkeyv(d, c(id, date.col))
 
-  # Create dummy year for filtering
-  if (!missing(year)){
-    d[, d.year := lubridate::year(x), env = list(x = date.col)]
-    d <- d[d.year == year]
-    d.cols <- append(d.cols, "d.year")
-  }
+  ## # Create dummy year for filtering
+  ## if (!missing(year)){
+  ##   d[, d.year := lubridate::year(x), env = list(x = date.col)]
+  ##   d <- d[d.year == year]
+  ##   d.cols <- append(d.cols, "d.year")
+  ## }
 
   if (any(period %in% 1:3)){
     d[, d.month := lubridate::month(x), env = list(x = date.col)]
@@ -64,8 +63,10 @@ find_episode <- function(d, year, period = 0,
   }
 
   # Dummy columns with  prefix "d."
-  d[, (d.cols) := NULL][]
+  if (!is.null(d.cols))
+    d[, (d.cols) := NULL][]
 
+  return(d[])
 }
 
 
