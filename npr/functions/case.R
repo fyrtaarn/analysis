@@ -97,7 +97,7 @@ is_dup_rhf <- function(d, id, skade, rhf, suffix = 1){
 #' Identify cases with similar date of injury but has different health institutions.
 #' Need to check with injury register to identify which health institutions
 #' the patients were registered to in NPR. If the health institution in FMDS isn't
-#' similar to those registered in NPR (entry point) within as selected time period
+#' similar to those registered in NPR (entry point) within a selected time period
 #' then it's considered double registery. Double registery is marked with 1 in column "xx.DEL"
 #' @param d1 Dataset for FMDS ie. external explanation for injury
 #' @param d2 Dataset for NPR ie. intery registration for injury
@@ -117,11 +117,10 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
   d <- d1[is.na(filter), env = list(filter = filter)]
 
   period <- as.integer(gsub("\\D", "", filter))
-  sufx <- (period * 10) + period
-
-  if (sufx == 0){
-    ## sufx <- "00"
-    stop("Comparing exact date isn't implemented yet")
+  if (is.integer(period)){
+    sufx <- (period * 10) + period
+  } else {
+    sufx <- period
   }
 
   d <- is_dup_rhf(d, id, skade = skade, rhf = rhf, suffix = sufx)
@@ -140,6 +139,7 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
     dateFrom <- xDato[["dateFrom"]][i]
     dateTo <- xDato[["dateTo"]][i]
 
+    ## include hoveddiagnoser? only similar diagnoser ie. first 3 codes, is considered as similar injury?
     x <- d2[lopenr == idx & innDato %between% c(dateFrom, dateTo),
             .(id, rhf), env = list(id = id, rhf = rhf)]
 
