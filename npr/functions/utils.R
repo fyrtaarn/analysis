@@ -13,11 +13,12 @@ get_valid_codes <- function(d, select.col, create.col, split = " "){
 
   dx <- data.table::copy(d)
 
-  # Linenumber is needed for couting ICD codes by line
+  # Linenumber is needed for counting ICD codes by line
   if (!("lnr" %in% names(dx))){
     dx[, lnr := 1:.N] # linenumber
   }
 
+  # Column can have multiple codes. Split them so each column has single code
   dx[, colnr := length(unlist(strsplit(x = col1, split = split))), by = lnr, env = list(col1 = select.col)]
   cols <- paste0("temp", 1:max(dx$colnr))
   dx[, (cols) := data.table::tstrsplit(x = col1, " "), env = list(col1 = select.col)]
@@ -32,7 +33,7 @@ get_valid_codes <- function(d, select.col, create.col, split = " "){
   }
 
   dx[ , (create.col) := rowSums(.SD) > 0, .SDcols = cols]
-  xcols <- c("colnr", cols)
+  xcols <- c("colnr", "lnr", cols)
   dx[, (xcols) := NULL][]
 }
 

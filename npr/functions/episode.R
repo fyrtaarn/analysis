@@ -31,15 +31,8 @@ find_episode <- function(d, period = 0,
   d <- unique(d)
   data.table::setkeyv(d, c(id, date.col))
 
-  ## # Create dummy year for filtering
-  ## if (!missing(year)){
-  ##   d[, d.year := lubridate::year(x), env = list(x = date.col)]
-  ##   d <- d[d.year == year]
-  ##   d.cols <- append(d.cols, "d.year")
-  ## }
-
   if (any(period %in% 1:3)){
-    d[, d.month := lubridate::month(x), env = list(x = date.col)]
+    d[, d.month := data.table::month(x), env = list(x = date.col)]
     d[, d.tertial := data.table::fcase(d.month %in% 1:4, 1,
                                        d.month %in% 5:8, 2,
                                        d.month %in% 9:12, 3)]
