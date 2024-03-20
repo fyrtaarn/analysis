@@ -43,8 +43,12 @@ get_valid_codes <- function(d, select.col = "hoveddiagnoser", create.col = "hovd
   }
 
   dx[ , (create.col) := rowSums(.SD) > 0, .SDcols = cols]
+
   oldCol <- paste0(select.col, ".old")
   data.table::setnames(dx, old = c(select.col, tempCol), new = c(oldCol, select.col))
+  dx[, (select.col) := trimws(col, which = "right"), env = list(col = select.col)]
+  dx[col == "" | is.na(old), (select.col) := NA, env = list(col = select.col, old = oldCol)]
+
   xcols <- c("colnr", "lnr", cols)
   dx[, (xcols) := NULL][]
 }
