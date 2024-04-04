@@ -47,3 +47,8 @@ Noen alders har alt for stor forskjell. F.eks ~dt2[lopenr == 92907, .(fodtAar_FM
 
 * Johan spørsmål
 Hvor mange pasienter er det hvert år som får en eller flere bidiagnoser i kapital XIX S00-T78?
+* ICE 10 koder
+- Varierende registreringen dvs. 4 til 5 sifrer.
+- Funksjon =get_valid_code()= renser ICD-10 koder til å bare ha 3 første sifrer
+* Helseforetak
+- Noen
