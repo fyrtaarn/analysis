@@ -15,4 +15,4 @@ dt2 <- unique(DT2)
 setkey(dt2, lopenr, skadeDato, skadeTid)
 
 # Identity with RHF
-dt2[, idno := paste0(lopenr, helseforetak_nr)]
+dt2[!is.na(lopenr), idno := paste0(lopenr, helseforetak_nr)]

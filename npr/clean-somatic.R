@@ -12,7 +12,7 @@ dt1 <- DT1[!duplicated(DT1)]
 setkey(dt1, lopenr, innDato)
 
 # Identity with RHF
-dt1[, idno := paste0(lopenr, helseforetak_nr)]
+dt1[!is.na(lopenr), idno := paste0(lopenr, helseforetak_nr)]
 
 ## # Hoved- og bidiagnoser
 ## ## Hvilke av cases som er gylding dvs S00 til T78 som hoveddiagnose og bidiagnose
