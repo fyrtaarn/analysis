@@ -125,6 +125,7 @@ is_rhf <- function(d1, d2, id, skade, rhf, filter = NULL , days = 3){
 
   d <- is_dup_rhf(d, id, skade = skade, rhf = rhf, suffix = sufx)
 
+  # Similar dates per lopenr ie. value of 2 or more in date2 > 2
   date2 <- paste0("xx.date", sufx)
   xDato <- d[!duplicated(id) & date2 > 1,
              .(dateFrom = skade, dateTo = data.table::as.IDate(skade) + days), by = id,
