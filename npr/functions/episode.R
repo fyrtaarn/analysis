@@ -3,8 +3,7 @@
 #' - It's an acute injury ie. hastegrad is 1
 #' - Posibility to select days from previous to the following injury of similar code for multiple injuries
 #' @param d Dataset
-#' @param year Year to select
-#' @param period Representing 4-months period ie. first, second or third.
+#' @param period Representing 4-months period ie. first, sedays or third.
 #'   Default is 0 to include data for the whole period else use 1, 2 or 3.
 #' @param date.col Columname for date for filtering
 #' @param id Columname representing unique id
@@ -12,11 +11,12 @@
 #' @param days If diffence in days should be considered ie. when a person has
 #'   more than one registered injuries of the same ICD-10 code
 #' @param diag.col Columname of codes for main diagnosis
+#' @return
 #' @examples
 #' dd <- find_episode(dt1, year = 2022, period = 1:2, acute = TRUE)
 #' dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
 
-find_episode <- function(d, year, period = 0,
+find_episode <- function(d, period = 0,
                          id = "lopenr",
                          date.col = "innDato",
                          acute = FALSE,
@@ -32,15 +32,8 @@ find_episode <- function(d, year, period = 0,
   d <- unique(d)
   data.table::setkeyv(d, c(id, date.col))
 
-  # Create dummy year for filtering
-  if (!missing(year)){
-    d[, d.year := lubridate::year(x), env = list(x = date.col)]
-    d <- d[d.year == year]
-    d.cols <- append(d.cols, "d.year")
-  }
-
   if (any(period %in% 1:3)){
-    d[, d.month := lubridate::month(x), env = list(x = date.col)]
+    d[, d.month := data.table::month(x), env = list(x = date.col)]
     d[, d.tertial := data.table::fcase(d.month %in% 1:4, 1,
                                        d.month %in% 5:8, 2,
                                        d.month %in% 9:12, 3)]
@@ -59,31 +52,37 @@ find_episode <- function(d, year, period = 0,
   # Get difference in days from previous to the following injuries when
   # multiple injuries are registered
   if (days != 0){
-    d[, days := x - data.table::shift(x, type = "lag"), by = lopenr, env = list(x = date.col)]
-    d <- check_codes(d = d, id = "lopenr", col = diag.col, cond = days)
+    d[, days := x - data.table::shift(x, type = "lag"), by = .(id, col), env = list(x = date.col, id = id, col = diag.col)]
+    d <- check_codes(d = d, id = id, col = diag.col, days = days)
   }
 
   # Dummy columns with  prefix "d."
-  d[, (d.cols) := NULL][]
+  if (!is.null(d.cols))
+    d[, (d.cols) := NULL][]
 
+  return(d[])
 }
 
 
 #' Find similar codes for a chosen period to avoid counting similar injury more than once.
 #' Column `dup` with value 1 represents possibility of similar injury. The rows should
-#' be carefully evaluated or deleted.
+#' be carefully evaluated or deleted ie. delete all with `dup == 1`
 #' @param d Dataset
 #' @param id Unque id
 #' @param col Column name for codes selection
-#' @param cond Condition for selection eg. 3 or 5 days
+#' @param days Condition for selection eg. 3 or 5 days
+#' @return A dataset with extra columname ie. `dup`. When `dup == 1` indicates the row is duplicated
+#' with the specified period
 #' @examples
 #' dj <- check_codes(dx, "lopenr", "hoveddiagnoser", 3)
-check_codes <- function(d, id, col, cond){
-  d[, dx := data.table::shift(x), by = y, env = list(x = col, y = id)]
-  d[, dup := data.table::fifelse(days <= dag & x == dx, 1, 0), by = y,
-    env = list(dag = cond, x = col, y = id)]
+check_codes <- function(d, id = "lopenr", col = "hoveddiagnoser", days){
 
-  d[, dx := NULL]
+  d[, dx := data.table::shift(x, fill = NA, type = "lag"), env = list(x = col)]
+  d[, dup := data.table::fifelse(days <= dag & x == dx, 1, 0), by = .(y, x),
+    env = list(dag = days, x = col, y = id)]
+
+  d[is.na(dup), dup := 0]
+  d[, dx := NULL][]
 }
 
 #OBS!! What happen when hoveddiagnoser has more than one codes??

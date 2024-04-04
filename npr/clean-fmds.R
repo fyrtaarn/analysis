@@ -13,7 +13,6 @@ DT2[, helseforetak_Navn := do_encode(helseforetak_Navn)]
 dt2 <- unique(DT2)
 
 setkey(dt2, lopenr, skadeDato, skadeTid)
-dt2[, lnr := 1:.N] # linenumber
-# Create a dummy var for merging
-dt2[, mergeVar := skadeDato]
-# dt2
+
+# Identity with RHF
+dt2[!is.na(lopenr), idno := paste0(lopenr, helseforetak_nr)]

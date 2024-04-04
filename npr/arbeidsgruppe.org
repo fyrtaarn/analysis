@@ -1,6 +1,7 @@
 #+title: Møte i arbeidsgruppe
 #+date: 22.02.2024
-* Hendelse - NPR
+* Dato: 2024-02-22
+** Hendelse - NPR
 - Personskadedata [[https://www.helsedirektoratet.no/rapporter/personskadedata-2022/kompletthet][rapport 2022]]:
   Ved sammenligning av aktivitet med somatikkdata telles kun de tilfellene der skaden og det akutte besøket på sykehus/legevakt skjer på samme dag.
 - Skadetilfelle fra personskade rapport:
@@ -8,27 +9,35 @@
   - Bruk unik dato og hoveddiagnosekode på tretegnsnivå
   - Hastegrad skal være akutt
 - Eksample finnes [[file:arbeidsgruppe.R::Setup][her]].
-** NPR definisjon 2022
+*** NPR definisjon 2022
 - 336 544 behandlede skadetilfeller med en skadediagnose. Referanse fra [[https://www.helsedirektoratet.no/rapporter/personskadedata-2022/sammendrag][rapporten]].
 - Vi har mange =NA= eller missing =lopenr= pga. ugyldig fødselsnummer og de som har reservert seg mot utleveringer av forskningsopplysninger i KPR.
-** Antall dager
+*** Antall dager
 - Bør det være grense?
-* Hendelse - FMDS
+** Hendelse - FMDS
 - Hvilken skal slettes? Se koden [[file:arbeidsgruppe.R::Hendelse FMDS][her]]
-* Fødselsdato og alder
+** Fødselsdato og alder
 Skal beregnes ved å benytte fødselsår og skadedato. Det finnes to fødselsår i
 datasettet dvs. =fodtAar_FMDS= og =fodtAar=. Den siste er renset mot
 folkeregisteret, men inneholder mange =NA= når det ikke er mulig å koble. Men
 vasket versjon inneholder også feil i tillegg til mange missing. Koden er [[file:dirty-fmds.R::Alder][her]].
-* Feilverdig
+** Feilverdig
 - Hva betyr det? f.eks =fremkomstmiddel=
 - Eksample finnes [[file:arbeidsgruppe.R::Feil rapportert verdi][her]].
-* Indikatorer
+** Indikatorer
 - Noen resultater fra FMDS er [[file:indikator.R::Indikatorer][her]].
 
-* Kodebok
+** Kodebok
 - Finnes på denne url [[https://shiny.fhi-api.com/users/ybk/public/codebook/][https://shiny.fhi-api.com/users/ybk/public/codebook/]]
 
-* Johan spørsmål
+** Johan spørsmål
 - Hvor mange pasienter er det hvert år som får en eller flere bidiagnoser i kapital XIX S00-T78?
 - Tall for 2022 finnes [[file:arbeidsgruppe.R::Johan spørsmål om antall][her]].
+
+* Dato: 2024-03-21
+** Ny levering for datasettet pga mangler behandlingsnavn for filtrering
+** Forskjelle i tallene som allerede er publisert for 2022
+** ICD-10 koder med 3 eller 4 sifre
+** Pasienter med flere sykehus registreringer
+- Lopenr 54500, 81171
+** FMDS som ikke har personskade registrering 
