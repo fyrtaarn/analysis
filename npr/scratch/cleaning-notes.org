@@ -1,0 +1,25 @@
+#+title: Cleaning Notes
+
+* FMDS
+Det som gjøres med FMDS data.
+** Duplikat
+Slett alle duplikater
+
+#+begin_src R
+dt2 <- unique(DT2)
+#+end_src
+** Hendelser
+En person som har blitt registeret med flere hendelser. Koden er [[file:dirty-fmds.R::Flere hendelse av samme ID][her]].
+
+#+begin_src R
+dt2[lopenr == 11947] #Hvilken skal slettes?
+dt2[lopenr == 48057]
+#+end_src
+
+- Ved duplikater hendelse dvs. =skadeDato=, behold første hendelse basert på =skadeTid=
+
+** Alder
+Skal beregnes ved å benytte fødselsår og skadedato. Det finnes to fødselsår i
+datasettet dvs. =fodtAar_FMDS= og =fodtAar=. Den siste er renset mot
+folkeregisteret, men inneholder mange =NA= når det ikke er mulig å koble. Men
+vasket versjon inneholder også feil i tillegg til mange missing. Koden er [[file:dirty-fmds.R::Alder][her]].
