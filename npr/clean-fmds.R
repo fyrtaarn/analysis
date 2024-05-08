@@ -6,7 +6,8 @@
 ## fmds <- fread("Data/02_extracted/23_31310_fmds_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(fmds, "./Data/fmds2023des.fst")
 
-DT2 <- fst::read_fst("./Data/fmds2023des.fst", as.data.table = TRUE)
+## DT2 <- fst::read_fst("./Data/fmds2023des.fst", as.data.table = TRUE)
+DT2 <- fst::read_fst("./Data/fmds2022og2023.fst", as.data.table = TRUE)
 DT2[, helseforetak_Navn := do_encode(helseforetak_Navn)]
 
 # Delete duplikater

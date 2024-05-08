@@ -5,7 +5,9 @@
 
 ## som <- fread("Data/02_extracted/23_31310_som_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(som, "./Data/som2023des.fst")
-DT1 <- fst::read_fst("./Data/som2023des.fst", as.data.table = TRUE)
+## DT1 <- fst::read_fst("./Data/som2023des.fst", as.data.table = TRUE)
+DT1 <- fst::read_fst("./Data/som2022og2023.fst", as.data.table = TRUE)
+DT1[, behandlingsstedNavn_alternativ := do_encode(behandlingsstedNavn_alternativ)]
 
 # Delete duplikater
 dt1 <- DT1[!duplicated(DT1)]
