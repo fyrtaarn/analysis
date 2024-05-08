@@ -24,7 +24,7 @@ kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 # kb[variabel %like% "^Org"][beskrivelse %like% "OUS"][, .(beskrivelse, kode)]
 
 
-# helseforetak_nr og behandlingsstedKode for Fyrtårnprosjektet
+# helseforetak_nr for Fyrtårnprosjektet
 sykehus <- c(
   974795639, #UNN Harstad
   974795787, #UNN Tromsø
@@ -39,6 +39,16 @@ sykehus <- c(
   974589095, #OUS somatikk
   993467049 #Oslo universitetssykehus HF
   # ??? OUS Skadelegevakten
+)
+
+#behandlingsstedKode
+behandssted <- c(
+  974589095, # OUS Ullevål
+  974589087, # OUS Oslo legevakt (Storgata)
+  922573026, #Helse Bergen, Skadepoliklinikken Bergen helsehus
+  974557746, #Helse Bergen, Haukeland
+  974749025, #St. Olavs hospital, Trondheim
+  974329506 #St. Olavs hospital, Orkdal
 )
 
 legevakt <- c(
