@@ -2,7 +2,7 @@
 setwd("f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_")
 source("https://raw.githubusercontent.com/helseprofil/misc/main/utils.R")
 
-pkg <- c("pacman","data.table", "fst", "lubridate", "ggplot2", "plotly", "S7")
+pkg <- c("pacman","data.table", "fst", "lubridate", "ggplot2", "plotly", "S7", "stringi")
 kh_load(char = pkg)
 
 root <- "~/Git-fhi/analysis/npr"
