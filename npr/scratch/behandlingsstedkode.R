@@ -1,3 +1,20 @@
+
+inst1 <- function(var, d1 = dt1){
+  if (is.numeric(var)){
+    d1[helseforetak_nr %in% var | behandlingsstedKode %in% var, .N, by = .(helseforetak_nr, behandlingsstedNavn_alternativ, behandlingsstedKode)]
+  } else {
+    dt1[behandlingsstedNavn_alternativ %ilike% var, .N, by = .(helseforetak_nr, behandlingsstedNavn_alternativ, behandlingsstedKode)]
+  }
+}
+
+inst2 <- function(var, d2 = dt2){
+  if(is.numeric(var)){
+    dt2[helseforetak_nr %in% var, .N, by = .(helseforetak_nr, helseforetak_Navn)]
+  } else {
+    dt2[helseforetak_Navn %ilike% var , .N, by = .(helseforetak_nr, helseforetak_Navn)]
+  }
+}
+
 ## behandlingsstedOrgNr fra filen "Organisering 2022 FT-enheter_fra_Inger_Dahlstrøm.xlsx"
 behandsstedskode1 <- c(
   922573026,
@@ -17,6 +34,14 @@ behandsstedskode1 <- c(
   974589095
 )
 
+## Somatic
+dt1[, .N, by = .(behandlingsstedNavn_alternativ)]
+
+# Bergen eller Haukeland
+inst1("Bergen")
+inst1("Haukeland")
+
+
 bh1 <- dt1[behandlingsstedKode %in% behandsstedskode1]
 bh1[, .N, by = .(behandlingsstedKode, helseforetak_nr, behandlingsstedNavn_alternativ)]
 
@@ -27,6 +52,9 @@ dd1 <- dt1[!( behandlingsstedKode %in% behandsstedskode1 )]
 bh2 <- dd1[helseforetak_nr %in% insx]
 bh2[, .N, by = .(helseforetak_nr, behandlingsstedKode, behandlingsstedNavn_alternativ)]
 
+## FMDS
+dt2[, .N, by = .(helseforetak_Navn, helseforetak_nr)]
+inst2("Bergen")
 
 ## InstitusjonsID fra filen "Organisering FT-enheter 2022 og 2023.xlsx"
 behandsstedskode <- c(
@@ -64,16 +92,23 @@ dd1 <- dt1[!( behandlingsstedKode %in% behandsstedskode )]
 bh2 <- dd1[helseforetak_nr %in% insx]
 bh2[, .N, by = .(helseforetak_nr, behandlingsstedKode, behandlingsstedNavn_alternativ)]
 
+
+dt2[, .N, by = .(helseforetak_Navn, helseforetak_nr)]
+
 ## St. Olav
-dt1[helseforetak_nr == 883974832, .N, by = behandlingsstedNavn_alternativ]
+inst1(883974832)
 
 # somatic og FMDS
 ## Lillehammeri.k. legevakt
-dt1[helseforetak_nr == 998580072, .N, by = helseforetak_Navn]
-dt1[helseforetak_nr == 998580072, .N, by = helseforetak_Navn]
+inst1(998580072)
 ## Lillehammeri.k. legevakt
-dt2[helseforetak_nr == 998580072, .N, by = helseforetak_Navn]
-dt2[helseforetak_nr == 998580072, .N, by = helseforetak_Navn]
+inst2(998580072)
 
-dt2[helseforetak_Navn %like% "Oslo", .N, by = helseforetak_Navn]
-dt2[, .N, by = .(helseforetak_Navn, helseforetak_nr)]
+## Nord
+inst1(c(974057344,940101808,983974899, 983974899))
+inst2(c(974057344,940101808,983974899, 983974899))
+
+## Oslo
+inst1("OUS")
+inst1("Ullevål")
+inst1("Storgata")
