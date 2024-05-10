@@ -155,3 +155,8 @@ is_delete_index <- function(dt, delidx){
 
   return(dtSub)
 }
+
+## alternative to %ilike% in data.table, ie. ignore case
+`%likeci%` <- function (x, pattern) {
+  stringi::stri_detect_regex(x, pattern, case_insensitive=TRUE)
+}

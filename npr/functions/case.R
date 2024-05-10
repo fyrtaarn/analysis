@@ -1,5 +1,5 @@
 #' Identify cases from FMDS dataset. Three possible methods can be used:
-#' 1. Keep only those that are found in FMDS and in both FMDS and Somatic when the date and health institution are matched
+#' 1. Keep only those that are found in FMDS and those found in both FMDS and Somatic when the date and health institution are matched
 #' 2. If multiple registeries in FMDS with similar dates and health institution, then keep the earlier date
 #' 3. If mulitple registeries in FMDS with same date but different health institutions, check with Somatic data. Matching
 #'    health institution will be kept.
@@ -10,9 +10,10 @@
 #' @param rhf Coloumn name for health institutions
 #' @param filter Column name for filtering inclusion and exclusion ie. `is.na(filter)`
 #' @param days A selected time period to consider as similar injury eg. 3 days
-#' @param verbose Show the steps
+#' @param verbose Keep variables for making the selection ie. xx.[var_name] to produce DELXX
 #' @param clean Delete all the possible duplicated cases
-#' @return A dataset with a DELXX column to indicate non-cases with value 1 if argument `clean = FALSE`
+#' @return A dataset with a DELXX column to indicate non-cases with value 1 if argument `clean = FALSE`. But if `verbose = TRUE`
+#' the output will include all variables needed to create DELXX.
 find_case <- function(d1, d2,
                       id = "lopenr",
                       skade = "skadeDato",
