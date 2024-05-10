@@ -3,18 +3,18 @@
 #' - It's an acute injury ie. hastegrad is 1
 #' - Posibility to select days from previous to the following injury of similar code for multiple injuries
 #' @param d Dataset
-#' @param period Representing 4-months period ie. first, sedays or third.
+#' @param period Representing 4-months period ie. first, second or third.
 #'   Default is 0 to include data for the whole period else use 1, 2 or 3.
 #' @param date.col Columname for date for filtering
 #' @param id Columname representing unique id
 #' @param acute Default is `FALSE`. Use `TRUE` to include only acute patients ie. Hastegrad = 1
-#' @param days If diffence in days should be considered ie. when a person has
-#'   more than one registered injuries of the same ICD-10 code
+#' @param days If diffence in days of registration should be considered ie. when a person has
+#'   more than one registered injuries of the same ICD-10 code. This is to avoid counting similar injuries more than once.
 #' @param diag.col Columname of codes for main diagnosis
 #' @return
 #' @examples
-#' dd <- find_episode(dt1, year = 2022, period = 1:2, acute = TRUE)
-#' dd <- find_episode(dt1, year = 2022, acute = TRUE, days = 3)
+#' dd <- find_episode(dt1, period = 1:2, acute = TRUE)
+#' dd <- find_episode(dt1, acute = TRUE, days = 3)
 
 find_episode <- function(d, period = 0,
                          id = "lopenr",
