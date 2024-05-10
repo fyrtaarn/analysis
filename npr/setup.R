@@ -23,6 +23,25 @@ do_encode <- function(x) gsub("Ã¦", "æ", useBytes = TRUE,
 kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 # kb[variabel %like% "^Org"][beskrivelse %like% "OUS"][, .(beskrivelse, kode)]
 
+# Check of institutions codes or names
+# -------------------------------------
+## Somatic dataset
+inst1 <- function(var, d1 = dt1){
+  if (is.numeric(var)){
+    d1[helseforetak_nr %in% var | behandlingsstedKode %in% var, .N, by = .(helseforetak_nr, behandlingsstedNavn_alternativ, behandlingsstedKode)]
+  } else {
+    dt1[behandlingsstedNavn_alternativ %ilike% var, .N, by = .(helseforetak_nr, behandlingsstedNavn_alternativ, behandlingsstedKode)]
+  }
+}
+
+## FMDS dataset
+inst2 <- function(var, d2 = dt2){
+  if(is.numeric(var)){
+    dt2[helseforetak_nr %in% var, .N, by = .(helseforetak_nr, helseforetak_Navn)]
+  } else {
+    dt2[helseforetak_Navn %ilike% var , .N, by = .(helseforetak_nr, helseforetak_Navn)]
+  }
+}
 
 # helseforetak_nr for Fyrtårnprosjektet
 sykehus <- c(

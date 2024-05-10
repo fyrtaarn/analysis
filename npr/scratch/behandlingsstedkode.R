@@ -1,4 +1,4 @@
-
+# Somatic dataset
 inst1 <- function(var, d1 = dt1){
   if (is.numeric(var)){
     d1[helseforetak_nr %in% var | behandlingsstedKode %in% var, .N, by = .(helseforetak_nr, behandlingsstedNavn_alternativ, behandlingsstedKode)]
@@ -7,6 +7,7 @@ inst1 <- function(var, d1 = dt1){
   }
 }
 
+# FMDS dataset
 inst2 <- function(var, d2 = dt2){
   if(is.numeric(var)){
     dt2[helseforetak_nr %in% var, .N, by = .(helseforetak_nr, helseforetak_Navn)]
@@ -101,6 +102,12 @@ dt2[, .N, by = .(helseforetak_Navn, helseforetak_nr)]
 
 ## St. Olav
 inst1(883974832)
+
+inst2("trondheim")
+inst2("olavs")
+
+inst2("trondheim")
+inst2("olavs")
 
 # somatic og FMDS
 ## Lillehammeri.k. legevakt
