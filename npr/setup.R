@@ -80,3 +80,33 @@ legevakt <- c(
   # Tønsberg-regionen legevakt
   # Bergen legevakt
 )
+
+## Helseforetak og InstitusjonsID fra filen "Organisering FT-enheter 2022 og 2023.xlsx"
+helseforetak <- c(
+  #2022
+  983974724, # Helse Bergen HF
+  883974832, # St.Olav Hospital HF
+  974329506, # Orkdal sjukehus
+  993187178, # Trondheim Legevakt
+  970188223, # Trondheim legevakt - HF
+  983974899, # Universitetssykehuset i Nord-Norge HF
+  983971709, # Sykehuset Innlandet HF
+  983975240, # Sørlandet Sykehus HF
+  983975259, # Sykehuset i Vestfold HF
+  993467049, # OUS HF
+  #2023
+  983974724, # Helse Bergen HF
+  883974832, # St.Olav Hospital HF
+  993187178, # Trondheim Legevakt - InstID
+  970188223, # Trondheim legevakt - HF
+  940101808, # Tromsø kommunale legevakt - InstID
+  974057344, # Tromsø kommune - HF
+  998580072, # Lillehammer i.k. legevakt - InstID
+  898564282, # Lillehammer i.k. legevakt - HF
+  983971709, # Sykehuset Innlandet HF
+  974631792, # Sykehuset Innlandet, Sanderud - InstID
+  983975240, # Sørlandet Sykehus HF
+  983975259, # Sykehuset i Vestfold HF
+  993467049, # OUS HF
+  998563143  # Hedmarken interkommunale legevakt
+)
