@@ -48,4 +48,16 @@ show_pro(ds, "alvorlighetsgrad", kb)
 ds[!is.na(byer), .N, by = .(fremkomstmiddel, byer)]
 show_pro(ds, "fremkomstmiddel", kb)
 
-ds[!is.na(byer), .N, by = .(alvorlighetsgrad, fremkomstmiddel)]
+# AIS
+show_pro(ds[alvorlighetsgrad == 1,], "fremkomstmiddel", kb)
+show_pro(ds[alvorlighetsgrad == 2,], "fremkomstmiddel", kb)
+show_pro(ds[alvorlighetsgrad == 3,], "fremkomstmiddel", kb)
+
+show_ais <- function(ais,  var, filter, kb = kb){
+  dd <- ds[byer == filter & alvorlighetsgrad == ais][var != "", env = list(var = var)]
+  show_pro(dd, "fremkomstmiddel", kb)
+}
+
+show_ais(ais = 1, "fremkomstmiddel", filter = "Oslo", kb)
+show_ais(ais = 2, "fremkomstmiddel", filter = "Oslo", kb)
+show_ais(ais = 3, "fremkomstmiddel", filter = "Oslo", kb)
