@@ -27,7 +27,7 @@ setkey(dt2, lopenr, skadeDato, skadeTid)
 # Clean FMDS after `find_case()` above
 DSS <- fst::read_fst("./Data/cleanFMDS.fst", as.data.table = TRUE)
 
-# Filter final data
+# Filter final data only for 2023
 dss <- DSS[data.table:::year(skadeDato) == 2023 & is.na(DELXX)
            ][helseforetak_nr %in% helseforetak]
 
@@ -46,18 +46,37 @@ show_pro(ds, "alvorlighetsgrad", kb)
 
 # fremkomstmiddel
 ds[!is.na(byer), .N, by = .(fremkomstmiddel, byer)]
-show_pro(ds, "fremkomstmiddel", kb)
+dx <- show_pro(ds, "fremkomstmiddel", kb)
 
 # AIS
 show_pro(ds[alvorlighetsgrad == 1,], "fremkomstmiddel", kb)
 show_pro(ds[alvorlighetsgrad == 2,], "fremkomstmiddel", kb)
 show_pro(ds[alvorlighetsgrad == 3,], "fremkomstmiddel", kb)
 
-show_ais <- function(ais,  var, filter, kb = kb){
-  dd <- ds[byer == filter & alvorlighetsgrad == ais][var != "", env = list(var = var)]
-  show_pro(dd, "fremkomstmiddel", kb)
+show_ais <- function(ais,  var, filter, kb = kb, dt = ds){
+  #kb = kodebok
+  #dt = dataset
+  #var = variable to select
+  #filter = City to filter
+  dd <- dt[byer == filter & alvorlighetsgrad == ais][var != "", env = list(var = var)]
+  dx <- show_pro(dd, "fremkomstmiddel", kb)
+  gp <- dx[!(var %chin% "-1"), env = list(var = var)][N > 3]
+  txt <- sprintf("AIS %s for %s", ais, filter)
+  rreg::regbar(gp, beskrivelse, N, title = txt)
 }
 
 show_ais(ais = 1, "fremkomstmiddel", filter = "Oslo", kb)
 show_ais(ais = 2, "fremkomstmiddel", filter = "Oslo", kb)
 show_ais(ais = 3, "fremkomstmiddel", filter = "Oslo", kb)
+
+show_ais(ais = 1, "fremkomstmiddel", filter = "Bergen", kb)
+show_ais(ais = 2, "fremkomstmiddel", filter = "Bergen", kb)
+show_ais(ais = 3, "fremkomstmiddel", filter = "Bergen", kb)
+
+show_ais(ais = 1, "fremkomstmiddel", filter = "Trondheim", kb)
+show_ais(ais = 2, "fremkomstmiddel", filter = "Trondheim", kb)
+show_ais(ais = 3, "fremkomstmiddel", filter = "Trondheim", kb)
+
+show_ais(ais = 1, "fremkomstmiddel", filter = "Tromsø", kb)
+show_ais(ais = 2, "fremkomstmiddel", filter = "Tromsø", kb)
+show_ais(ais = 3, "fremkomstmiddel", filter = "Tromsø", kb)
