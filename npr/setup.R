@@ -12,13 +12,21 @@ for (i in fx)
 
 # Encoding solution with some modification from
 # https://github.com/StoXProject/RstoxData/issues/10#issuecomment-510542301
-do_encode <- function(x) gsub("Ã¦", "æ", useBytes = TRUE,
+do_encode <- function(x) gsub("Ã¦|\xe6", "æ", useBytes = TRUE,
                               gsub("Ã¥|\xe5", "å", useBytes = TRUE,
-                                   gsub("Ã¸|xe6|\xf8", "ø", useBytes = TRUE,
+                                   gsub("Ã¸|\xf8", "ø", useBytes = TRUE,
                                         gsub("\xed", "i", useBytes = TRUE,
                                              gsub("\xc5", "Å", useBytes = TRUE,
                                                   gsub("\xd8", "Ø", x, useBytes = TRUE))))))
 
+# Encoding solution with some modification from
+# https://github.com/StoXProject/RstoxData/issues/10#issuecomment-510542301
+is_encode <- function(x) gsub("\\u00c3\\u00a6|\xe6", "\u00e6", useBytes = TRUE,
+                              gsub("\\u00c3\\u00a5|\xe5", "\u00e5", useBytes = TRUE,
+                                   gsub("\\u00c3\\u00b8|\xf8", "\u00f8", useBytes = TRUE,
+                                        gsub("\xed", "i", useBytes = TRUE,
+                                             gsub("\xc5", "\u00c5", useBytes = TRUE,
+                                                  gsub("\xd8", "\u00d8", x, useBytes = TRUE))))))
 
 kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
 # kb[variabel %like% "^Org"][beskrivelse %like% "OUS"][, .(beskrivelse, kode)]
