@@ -4,7 +4,7 @@ source(file.path(root, "setup.R"))
 source(file.path(root, "clean-fmds.R"))
 
 # Hendelser / episoder ---------------------
-DT1 <- fst::read_fst("./Data/som2023des.fst", as.data.table = TRUE)
+DT1 <- fst::read_fst("./Data/som2022og2023.fst", as.data.table = TRUE)
 
 dt1 <- DT1[!duplicated(DT1)] # slett duplikater
 setkey(dt1, lopenr, innDato)
@@ -16,7 +16,7 @@ dt1 <- dt1[!is.na(lopenr)]
 ## Bare for 2022 ------
 dd <- dt1[lubridate::year(innDato) == 2022, ]
 
-(opp <- dd[, .(count =.N), by = lopenr][order(count)])
+(opp <- dd[, .(count =.N), by = lopenr][order(count)])[, .N, by = count]
 
 ## S00 - T78 --------
 dx1 <- get_valid_codes(d = dd, "hoveddiagnoser", "hovdiag")
@@ -29,27 +29,31 @@ dx2 <- dx1[hovdiag == 1]
 show_pro(dx2, "Hastegrad", kb) # 336 544 i rapporten fra 2022
 dx3 <- dx2[Hastegrad == 1]
 
-(opp1 <- dx3[, .(count =.N), by = lopenr][order(count)])
+(opp1 <- dx3[, .(count =.N), by = lopenr][order(count)])[, .N, by = count]
 
-# x1 <- opp1[count == 6,]$lopenr
+
+x1 <- opp1[count == 6,]$lopenr
 # dx3[dager %between% c(3,5), ][lopenr %in% x1, .(lopenr)]
-dx3[lopenr == 935970] #
-dx3[lopenr == 553390] #
+.xx <- sample(x1, 2)
+dx3[lopenr == .xx[1]] #
+dx3[lopenr == .xx[2]] #
 
 # Forskjeller i dager fra forriger hendelse til den neste
 dx3[, dager := innDato - shift(innDato, type = "lag"), by = lopenr]
 (lnr3 <- dx3[dager == 3][!duplicated(lopenr), .(lopenr)])
 
-dx3[lopenr == 75421]
-dx3[lopenr == 111537]
+.x3 <- sample(lnr3$lopenr, 2)
+dx3[lopenr == .x3[1]]
+dx3[lopenr == .x3[2]]
 
-dx3[lopenr == 423869] #like S662 - ingen FMDS
-dx3[lopenr == 202036] #like S711 - en i FMDS
-dx3[lopenr == 503386] #2 forskjellige koder - ingen FMDS
+## dx3[lopenr == 423869] #like S662 - ingen FMDS
+## dx3[lopenr == 202036] #like S711 - en i FMDS
+## dx3[lopenr == 503386] #2 forskjellige koder - ingen FMDS
 
 ( lnr5 <- dx3[dager == 5][!duplicated(lopenr), .(lopenr)] )
-dx3[lopenr == 71513]
-dx3[lopenr == 94874]
+.x5 <- sample(lnr5$lopenr, 2)
+dx3[lopenr == .x5[1]]
+dx3[lopenr == .x5[2]]
 
 # Finnes det på FMDS 2022 ----------------------------
 fdt <- dt2[lubridate::year(skadeDato) == 2022, ]
