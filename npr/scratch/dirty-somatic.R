@@ -2,9 +2,9 @@
 # Somatic
 # --------------
 ## som <- fread("Data/02_extracted/23_31310_som_til_utlevering.csv")
-som <- fread("Data/02_extracted/20240422/24_01903_som_til_utlevering.csv", encoding = "Latin-1")
-fst::write_fst(som, "./Data/som2022og2023.fst")
-DT1 <- fst::read_fst("./Data/som2022og2023.fst", as.data.table = TRUE)
+som <- fread("Data/02_extracted/20240711/24_01903_som_til_utlevering.csv", encoding = "Latin-1")
+# fst::write_fst(som, "./Data/som20240711.fst")
+DT1 <- fst::read_fst("./Data/som20240711.fst", as.data.table = TRUE)
 DT1[, behandlingsstedNavn_alternativ := do_encode(behandlingsstedNavn_alternativ)]
 ## str(DT1)
 ## names(DT1)
@@ -21,13 +21,10 @@ setkey(dt1, lopenr, innDato)
 dt1[, lnr := 1:.N]
 dt1
 
-dt1[lopenr ==876635]
-DT1[lopenr ==876635]
-
 ddup <- DT1[duplicated(DT1) | duplicated(DT1, fromLast = TRUE)]
 dim(ddup)
-ddup[lopenr == 94430]
-ddup[lopenr ==876635]
+id01 <- ddup[!duplicated(lopenr)][1:4]$lopenr
+ddup[lopenr %in% id01]
 
 
 # Sort and line  number
@@ -53,6 +50,9 @@ dt1[fodsNr_Gyldig == 0,][sample(.N, 20)]
 # Episoder
 opp <- dt1[, .(count =.N), by = lopenr][order(count)]
 opp
+
+opp[count == 3]
+dt1[lopenr == 10]
 
 dt1[lopenr == 876389] #3 - 1 episode pga. Hastegrad 1
 dt1[lopenr == 290124] #4 - 2 episoder pga. Hastegrad 1

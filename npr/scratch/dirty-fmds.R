@@ -6,7 +6,7 @@
 
 # FMDS
 # -----
-fmds <- fread("Data/02_extracted/20240422/24_01903_fmds_til_utlevering.csv", encoding = "Latin-1")
+fmds <- fread("Data/02_extracted/20240711/24_01903_fmds_til_utlevering.csv", encoding = "Latin-1")
 fst::write_fst(fmds, "./Data/fmds2022og2023.fst")
 
 DT2 <- fst::read_fst("./Data/fmds2022og2023.fst", as.data.table = TRUE)

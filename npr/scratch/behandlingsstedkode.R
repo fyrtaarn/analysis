@@ -119,7 +119,11 @@ inst2(998580072)
 inst1(c(974057344,940101808,983974899, 983974899))
 inst2(c(974057344,940101808,983974899, 983974899))
 
-## Oslo
+## Sør Øst
 inst1("OUS")
 inst1("Ullevål")
 inst1("Storgata")
+
+inst2("ullevål")
+
+inst2("hamar")
