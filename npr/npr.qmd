@@ -1,0 +1,26 @@
+---
+title: NPR Anonyme data
+format: html
+---
+
+```{r}
+#| label: setup
+#| include: false
+#| echo: false
+
+library(data.table)
+
+setwd("f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_")
+ntr <- fread("./Data/02_extracted/NTR20240706/NTR20240706.csv", sep = ";")
+
+```
+
+## Background
+
+Some descriptive statistics.
+
+```{r}
+#| label: descriptive
+
+ntr
+```
