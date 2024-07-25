@@ -3,7 +3,7 @@
 # -----
 # run file `setup.R` prior using this file
 
-## fmds <- fread("Data/02_extracted/23_31310_fmds_til_utlevering.csv", encoding = "Latin-1")
+## fmds <- fread("./Data/02_extracted/20231213/23_31310_fmds_til_utlevering.csv", encoding = "Latin-1")
 ## fst::write_fst(fmds, "./Data/fmds2023des.fst")
 
 ## DT2 <- fst::read_fst("./Data/fmds2023des.fst", as.data.table = TRUE)
