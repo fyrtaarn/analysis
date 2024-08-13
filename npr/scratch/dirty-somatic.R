@@ -2,12 +2,15 @@
 # Somatic
 # --------------
 ## som <- fread("Data/02_extracted/23_31310_som_til_utlevering.csv")
-som <- fread("Data/02_extracted/20240711/24_01903_som_til_utlevering.csv", encoding = "Latin-1")
+som <- fread("./Data/02_extracted/NPR20240711/24_01903_som_til_utlevering.csv", encoding = "Latin-1")
 # fst::write_fst(som, "./Data/som20240711.fst")
 DT1 <- fst::read_fst("./Data/som20240711.fst", as.data.table = TRUE)
 DT1[, behandlingsstedNavn_alternativ := do_encode(behandlingsstedNavn_alternativ)]
 ## str(DT1)
 ## names(DT1)
+
+## Year for filter
+DT1[, yr := year(innDato)]
 
 # Duplikater ---------
 dim(DT1)
@@ -18,7 +21,7 @@ dim(dt1)
 # Sort and line  number
 # dt1 <- dt1[order(innDato, lopenr)]
 setkey(dt1, lopenr, innDato)
-dt1[, lnr := 1:.N]
+dt1[, lnr := 1:.N] # needed when identifying hoveddiagnose
 dt1
 
 ddup <- DT1[duplicated(DT1) | duplicated(DT1, fromLast = TRUE)]
@@ -39,6 +42,14 @@ dt1[, mergeVar := innDato]
 dt1[is.na(lopenr), .N] #ie. ugylding fødselsnummer
 dt1[is.na(lopenr), ][1:5]
 
+## alternative løpenummer ----------------------
+dt1[is.na(alt_lopenr), .N]
+dt1[is.na(alt_lopenr), ][1:5]
+dt1[!is.na(alt_lopenr) & is.na(lopenr), ][1:5]
+
+lpnx <- dt1[!is.na(alt_lopenr)]$alt_lopenr
+lpn1 <- as.integer(gsub("^UNPR", "", lpnx))
+
 
 # Fødselsnummer
 dt1[, .N, by = fodsNr_Gyldig] #10164 - ugyldig
@@ -46,36 +57,43 @@ dt1[!duplicated(lopenr), .N, by = fodsNr_Gyldig] #607295 og ikke 607296 som i br
 
 dt1[fodsNr_Gyldig == 0,][sample(.N, 20)]
 
-
-# Episoder
+# ----------------------------------------------
+# Antall episoder
+# ----------------------------------------------
 opp <- dt1[, .(count =.N), by = lopenr][order(count)]
 opp
 
-opp[count == 3]
-dt1[lopenr == 10]
+( e3 <- opp[count == 3][sample(.N, 2)] )
+dt1[lopenr == e3[1, lopenr]]
+dt1[lopenr == e3[2, lopenr]]
 
-dt1[lopenr == 876389] #3 - 1 episode pga. Hastegrad 1
-dt1[lopenr == 290124] #4 - 2 episoder pga. Hastegrad 1
-dt1[lopenr == 679011] #ingen ny episode
+## dt1[lopenr == 876389] #3 - 1 episode pga. Hastegrad 1
+## dt1[lopenr == 290124] #4 - 2 episoder pga. Hastegrad 1
+## dt1[lopenr == 679011] #ingen ny episode
 
-opp[count == 10]
-dt1[lopenr == 998945] #10 - 1 episoder
-dt1[lopenr == 577056] #10 - 3 episoder?
-dt1[lopenr == 485540] #10 - 3 episoder?
-dt2[lopenr == 485540] #10 - 3 episoder?
+( e10 <- opp[count == 10][sample(.N, 2)] )
+dt1[lopenr == e10[1, lopenr]]
+dt1[lopenr == e10[2, lopenr]]
+
+dt1[lopenr == 868401] #10 - 3 hastegrad 1 samme hoveddiagnose
+
+## dt1[lopenr == 998945] #10 - 1 episoder
+## dt1[lopenr == 577056] #10 - 3 episoder?
+## dt1[lopenr == 485540] #10 - 3 episoder?
+## dt2[lopenr == 485540] #10 - 3 episoder?
 
 
-dt1[lopenr == 128429] #15
-dt1[lopenr == 33597] #15
-dt1[lopenr == 1152734] #15 med flere hoveddiagnoser og bidagnoser per kolonne
+## dt1[lopenr == 128429] #15
+## dt1[lopenr == 33597] #15
+## dt1[lopenr == 1152734] #15 med flere hoveddiagnoser og bidagnoser per kolonne
 
-dt1[lopenr == 806595][order(innDato)] #20 - Forgifning
-dt1[lopenr == 267482]
+## dt1[lopenr == 806595][order(innDato)] #20 - Forgifning
+## dt1[lopenr == 267482]
 
-dt1[lopenr == 40864] #40
+## dt1[lopenr == 40864] #40
 
-#98
-dt1[lopenr == 804380][Hastegrad == 1]
+## #98
+## dt1[lopenr == 804380][Hastegrad == 1]
 
 # Create group by lopenr
 ## dt1[, grp := .GRP, by = lopenr]
@@ -85,23 +103,18 @@ dd[lopenr == 804676]
 dd[lopenr == 778520]
 dd[lopenr == 929016]
 
-# Diagnose S00-T78, exclude others
-icd10 <- fread("https://raw.githubusercontent.com/k4m1113/ICD-10-CSV/master/codes.csv")
-saveRDS(icd10, "ICD10codes.RDS")
 
-## injuryCodes <- icd10[count %like% "^S" | count %like% "^T"][, Codes := substr(count, 1, 3)]
-injuryCodes <- icd10[V1 %like% "^S" | V1 %like% "^T"][, Codes := substr(V1, 1, 3)][]
-xcode <- paste0("T", c(79, 80:88, 90:98)) #Codes to exclude
-injuryCodes[, fmds := grepl(paste0("^(", paste(xcode, collapse = "|"),").*$"), Codes)]
-codes <- unique(injuryCodes[fmds == 0, Codes])
-saveRDS(codes, "validCodes.RDS")
-injuryCodes[Codes %like% "^T76", .(Codes, fmds)]
-injuryCodes[Codes %like% "^T79", .(Codes, fmds)]
+# ICD-10 --------------
+codes <- readRDS("./Data/validCodes.RDS")
 
+# Identify at least one of the hoveddiagnose codes is within S00-T78
 codeTXT <- paste0("^", paste(codes, collapse = "|"))
 dt1[is.na(hoveddiagnoser), case := NA]
 dt1[, case := sum(grepl(paste0("^", paste(codes, collapse = "|")), hoveddiagnoser)) > 0, by = lnr]
+# dt1[, case := sum(grepl(paste0("^", paste(codes, collapse = "|")), hoveddiagnoser)) > 0]
 
+## Double check that "case" column is TRUE -----
+# Når diagnoser inneholder flere koder
 # Hoved- og bidiagnoser, flere koder skal deles til egne kolonner
 ## nr <- c("hovednr", "bidianr")
 # Telle diagnoser
@@ -114,7 +127,7 @@ homax <- paste0("hovdiag", 1:max(dt1$hovednr))
 dt1[, (homax) := tstrsplit(hoveddiagnoser, " ")]
 
 for (j in homax){
-  if(class(dt1[[j]]) == 'character')
+  if(is.character(dt1[[j]]))
     set(dt1, j = j, value = substr(dt1[[j]], 1, 3) %chin% codes)
 }
 
@@ -126,12 +139,20 @@ bimax <- paste0("bidiag", 1:max(dt1$bidianr))
 dt1[, (bimax) := tstrsplit(bidiagnoser, " ")]
 
 
-tt <- "S060 S018 S023 S0290 T90 T80"
-tt <- "S06 S01 S02 S02 T90 T80 T78"
-unlist(strsplit(tt, " "))
-sum(grepl("^[^T79|T80|T90]", unlist(strsplit(tt, " "))))
+tt4 <- "S060 T9010 S018 S023 S0290 T801 T780 T802"
+tt3 <- "S06 T90 S01 S02 S02 T80 T78 T80"
+unlist(strsplit(tt4, " "))
+## sum(grepl("^[^T79|T80|T90]", unlist(strsplit(tt4, " "))))
+sum(grepl("^T79|T80|T90", unlist(strsplit(tt4, " "))))
+sum(grepl(codeTXT, unlist(strsplit(tt4, " ")))) # bruk denne løsningen
 
-sum(unlist(strsplit(tt, " ")) %chin% paste0("^", codes)) > 0
+
+unlist(strsplit(tt3, " ")) %chin% codes
+sum(unlist(strsplit(tt3, " ")) %chin% codes) > 0
+
+substr(unlist(strsplit(tt4, " ")), 1, 3)
+unlist(substr(unlist(strsplit(tt4, " ")), 1, 3)) %chin% codes
+sum(unlist(strsplit(tt4, " ")) %chin% codes) > 0
 
 
 # Demografisk

@@ -6,7 +6,7 @@
 
 # FMDS
 # -----
-fmds <- fread("Data/02_extracted/20240711/24_01903_fmds_til_utlevering.csv", encoding = "Latin-1")
+fmds <- fread("Data/02_extracted/NPR20240711/24_01903_fmds_til_utlevering.csv", encoding = "Latin-1")
 fst::write_fst(fmds, "./Data/fmds2022og2023.fst")
 
 DT2 <- fst::read_fst("./Data/fmds2022og2023.fst", as.data.table = TRUE)
@@ -21,6 +21,10 @@ dt2[, lnr := 1:.N] # linenumber
 dt2[, mergeVar := skadeDato]
 
 names(dt2)
+
+## alternative lopenr
+lpnxf <- dt2[!is.na(alt_lopenr)]$alt_lopenr
+lpn2 <- as.integer(gsub("^UFMDS", "", lpnxf))
 
 # Flere hendelse av samme ID
 # 1. Hvis samme dato, velg nyeste tid
