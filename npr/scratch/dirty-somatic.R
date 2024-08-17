@@ -110,7 +110,7 @@ codes <- readRDS("./Data/validCodes.RDS")
 # Identify at least one of the hoveddiagnose codes is within S00-T78
 codeTXT <- paste0("^", paste(codes, collapse = "|"))
 dt1[is.na(hoveddiagnoser), case := NA]
-dt1[, case := sum(grepl(paste0("^", paste(codes, collapse = "|")), hoveddiagnoser)) > 0, by = lnr]
+dt1[, case := sum(grepl(codeTXT, hoveddiagnoser)) > 0, by = lnr]
 # dt1[, case := sum(grepl(paste0("^", paste(codes, collapse = "|")), hoveddiagnoser)) > 0]
 
 ## Double check that "case" column is TRUE -----
