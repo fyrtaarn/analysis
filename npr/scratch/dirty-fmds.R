@@ -34,39 +34,48 @@ likeID <- dt2[, .(count =.N), by = lopenr][order(count)]
 summary(likeID[!is.na(lopenr)]$count)
 likeID[, .N, keyby = count]
 
-#likeID[count == 2]
-dt2[lopenr == 11947] #Hvilken skal slettes? Match på helsefortak_nr fra somatikk
-dt1[lopenr == 11947]
+# Utfordinger
+# - Hvilken skal slettes? Match på helsefortak_nr fra somatikk
+# - Har 2 forskjellige inst, men finnes bare en inst i somatikk
+# - Lik dato men forskjellige skadetid
+# - Forskjell med får dager fra somtaikk til FMDS. Kan det være forsinkelse med registrering?
 
-dt2[lopenr == 794767] #Bergen og Vestfold, men ulik skadeTid
-dt1[lopenr == 794767] #somatikk data registreres bare Vestfold
+id2 <- sample(likeID[count == 2]$lopenr, 3)
+dt2[lopenr == id2[1]]
+dt1[lopenr == id2[1]]
 
-dt2[lopenr == 271] #like dato med forskjellige skade tid
-dt1[lopenr == 271] #2 dager forskjelle i somatikk etter skadeDato i FMDS dvs. bør ikke telles som manglende FMDS
+dt2[lopenr == id2[2]]
+dt1[lopenr == id2[2]]
 
-#likeID[count == 3]
-dt2[lopenr == 50] # 3 dager forskjell fra somatikk to FMDS
-dt1[lopenr == 50]
+## dt2[lopenr == 794767] #Bergen og Vestfold, men ulik skadeTid
+## dt1[lopenr == 794767] #somatikk data registreres bare Vestfold
 
-dt2[lopenr == 1425]
-dt1[lopenr == 1425]
+## dt2[lopenr == 271] #like dato med forskjellige skade tid
+## dt1[lopenr == 271] #2 dager forskjelle i somatikk etter skadeDato i FMDS dvs. bør ikke telles som manglende FMDS
 
-#likeID[count == 5]
-dt2[lopenr == 724355] #se somatikk data.. all har FMDS med 1 dag forskjell. En rad i FMDS må slettes dvs. lik dato
-dt1[lopenr == 724355]
+## #likeID[count == 3]
+## dt2[lopenr == 50] # 3 dager forskjell fra somatikk to FMDS
+## dt1[lopenr == 50]
 
-dt2[lopenr == 249769]
-dt1[lopenr == 249769]
+## dt2[lopenr == 1425]
+## dt1[lopenr == 1425]
 
-dt2[lopenr == 67514]
+## #likeID[count == 5]
+## dt2[lopenr == 724355] #se somatikk data.. all har FMDS med 1 dag forskjell. En rad i FMDS må slettes dvs. lik dato
+## dt1[lopenr == 724355]
 
-likeID[count == 10]
-dt2[lopenr == 6769]
+## dt2[lopenr == 249769]
+## dt1[lopenr == 249769]
 
-likeID[count == 50]
-dt2[lopenr == 390585]
-dt1[lopenr == 390585]
-dd[lopenr == 390585]
+## dt2[lopenr == 67514]
+
+## likeID[count == 10]
+## dt2[lopenr == 6769]
+
+## likeID[count == 50]
+## dt2[lopenr == 390585]
+## dt1[lopenr == 390585]
+## dd[lopenr == 390585]
 
 # ----------------------------
 # Function -------------
