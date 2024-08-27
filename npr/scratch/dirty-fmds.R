@@ -13,8 +13,12 @@ DT2 <- fst::read_fst("./Data/fmds20240711.fst", as.data.table = TRUE)
 DT2[, helseforetak_Navn := do_encode(helseforetak_Navn)]
 
 # Delete duplikater
-dt2 <- unique(DT2)
+dt22 <- unique(DT2)
 
+dt22[, yr  := year(skadeDato)]
+dt2 <- dt22[yr == 2024]
+
+# dt2[, tid := chron::times(skadeTid)]
 setkey(dt2, lopenr, skadeDato, skadeTid)
 dt2[, lnr := 1:.N] # linenumber
 # Create a dummy var for merging
@@ -40,12 +44,29 @@ likeID[, .N, keyby = count]
 # - Lik dato men forskjellige skadetid
 # - Forskjell med får dager fra somtaikk til FMDS. Kan det være forsinkelse med registrering?
 
-id2 <- sample(likeID[count == 2]$lopenr, 3)
-dt2[lopenr == id2[1]]
-dt1[lopenr == id2[1]]
+cols1 <- c("lopenr", "helseforetak_nr", "innDato", "utDato", "Hastegrad", "hoveddiagnoser")
+cols2 <- c("lopenr", "helseforetak_nr", "helseforetak_Navn", "alvorlighetsgrad", "skadeDato", "skadeMekanisme")
 
-dt2[lopenr == id2[2]]
-dt1[lopenr == id2[2]]
+id2 <- sample(likeID[count == 2]$lopenr, 3)
+dt2[lopenr == id2[1], ..cols2]
+dt1[lopenr == id2[1], ..cols1]
+
+dt2[lopenr == id2[2], ..cols2]
+dt1[lopenr == id2[2], ..cols1]
+
+id4 <- sample(likeID[count == 4]$lopenr, 3)
+dt2[lopenr == id4[1], ..cols2]
+dt1[lopenr == id4[1], ..cols1]
+
+dt2[lopenr == id4[2], ..cols2]
+dt1[lopenr == id4[2], ..cols1]
+
+id6 <- sample(likeID[count == 5]$lopenr, 3)
+dt2[lopenr == id6[1], ..cols2]
+dt1[lopenr == id6[1], ..cols1]
+
+dt2[lopenr == id6[2], ..cols2]
+dt1[lopenr == id6[2], ..cols1]
 
 ## dt2[lopenr == 794767] #Bergen og Vestfold, men ulik skadeTid
 ## dt1[lopenr == 794767] #somatikk data registreres bare Vestfold

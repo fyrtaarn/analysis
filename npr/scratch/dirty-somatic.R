@@ -12,6 +12,8 @@ DT1[, behandlingsstedNavn_alternativ := do_encode(behandlingsstedNavn_alternativ
 ## Year for filter
 DT1[, yr := year(innDato)]
 
+DT1 <-DT1[yr == 2024]
+
 # Duplikater ---------
 dim(DT1)
 DT1[duplicated(DT1), .N]
