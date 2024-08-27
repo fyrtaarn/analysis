@@ -1,0 +1,197 @@
+---
+title: "FMDS første tertial 2024"
+lang: no
+language:
+    en:
+        crossref-fig-title: "Figure"
+    no:
+        crossref-fig-title: "Figur"
+format:
+  html:
+    toc: true
+    toc-title: Innhold
+    code-fold: true
+    code-summary: "Vis kode"
+    self-contained: true
+---
+
+`r format(Sys.Date(), "%d %B %Y")`
+
+```{r oppsett}
+#| output: false
+#| echo: false
+
+setwd("f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_")
+source("https://raw.githubusercontent.com/helseprofil/misc/main/utils.R")
+
+pkg <- c("pacman","data.table", "fst", "lubridate", "ggplot2", "plotly", "S7", "stringi", "knitr", "gt")
+kh_load(char = pkg)
+
+root <- "~/Git-fhi/analysis/npr"
+fx <- list.files(file.path(root, "functions"))
+for (i in fx)
+  source(file.path(root, "functions", i))
+
+# kodebok
+kb <- fread("./Data/Kodebok_Skader_i_Norge.csv", encoding = "Latin-1")
+
+# Somatikk
+dt1 <- fread("./Data/02_extracted/NPR20240711/24_01903_som_til_utlevering.csv", encoding = "Latin-1")
+dt1 <- unique(dt1)
+dt1[, yr := year(innDato)]
+dt1 <- dt1[yr == 2024]
+setkey(dt1, lopenr, innDato)
+
+# FMDS
+dt2 <- fread("Data/02_extracted/NPR20240711/24_01903_fmds_til_utlevering.csv", encoding = "Latin-1")
+dt2 <- unique(dt2)
+dt2[, yr  := year(skadeDato)]
+dt2 <- dt2[yr == 2024]
+
+# dt2[, tid := chron::times(skadeTid)]
+setkey(dt2, lopenr, skadeDato, skadeTid)
+```
+# Info
+
+- [Kodebok](https://shiny.fhi-api.com/users/ybk/public/codebook/ "kodebok") til utleverte FMDS data fra NPR 
+- Utarbeider en [R pakke](https://fyrtaarn.github.io/fyr/ "fyr") for å automatisere analysene
+- Data utlevering for første tertial 2024 kom i midten av juli 2024 
+
+# Datasettet
+
+```{r}
+#| output: false 
+
+likeID <- dt2[, .(count =.N), by = lopenr][order(count)]
+
+## alternative lopenr
+lpnxf <- dt2[!is.na(alt_lopenr)]$alt_lopenr
+lpn2 <- as.integer(gsub("^UFMDS", "", lpnxf))
+```
+
+::: {.callout-note title="OBS!" collapse=true}
+Det er `r length(lpnxf)` personer hadde ugyldig personnummer og er ekskludert i analysen.
+:::
+
+- Det er **`r dt2[!duplicated(lopenr) & !is.na(lopenr), .N]`** personer med
+gyldig personnummer ble registeret med FMDS.
+- De fleste hadde bare en skade registrering (N = `r likeID[, .N, keyby = count]$N[1]`). Se @fig-fmds under. 
+
+
+```{r}
+#| label: fig-fmds
+#| fig-cap: "Skadetilfelle"
+#| echo: false
+
+fmdsTbl <- likeID[!is.na(lopenr), .N, keyby = count]
+gt(fmdsTbl) |>
+  tab_header(
+    title = "Antall FMDS registreringer per person",
+    subtitle = "første tertial 2024"
+  )
+```
+
+## Kjønn
+
+Kjønnsfordeling for FMDS data er som følgende:
+
+```{r}
+#| echo: false
+#| cache: true
+
+dd2 <- dt2[!is.na(lopenr) & !duplicated(lopenr)]
+kjtb <- show_pro(dd2[!is.na(lopenr)], "kjonn", kb)
+
+gt(kjtb) |>
+  tab_header(title = "Fordeling av kjønn")
+
+```
+
+## Alder
+
+```{r}
+#| echo: false
+#| cache: true
+
+dd2[fodtAar_FMDS > 0, ageFMDS := lubridate::year(skadeDato) - fodtAar_FMDS]
+ageDT <- do_agegroup(dd2[!is.na(lopenr)], "ageFMDS", c(0, 18, 25, 35, 45, 55, 65, 75, Inf), "agegp")
+
+ageDT <- ageDT[ageFMDS < 150] #can't be more than 150 yrs
+agegp <- show_pro(ageDT, "agegp")
+
+gt(agegp) |>
+  tab_header(title = "Aldergrupper")
+
+```
+
+Hvem er de i aldersgruppe 75+?
+
+```{r}
+#| echo: false
+
+age75 <- ageDT[ageFMDS < 150 & agegp %chin% "75+", .(min = min(ageFMDS, na.rm = T), max = max(ageFMDS, na.rm = T), med = median(ageFMDS))]
+
+gt(age75) |>
+  tab_header(title = "Pasienter i aldersgruppe 75+")
+
+```
+
+
+# Skader
+
+Skadetilfelle:
+
+- *innDato* og *skadeDato* er innen 3 dager
+- *Hastegrad* er akutt
+
+Se @fig-fmds hva disse betyr i antall skadetilfeller. I personskade rapporten ble det presisert som følgende:
+
+> Dersom pasienten er registrert med flere slike opphold for samme skade
+> på ulike datoer, kan samme skade bli telt flere ganger
+
+Bør det håndteres annerledes?
+
+## Pasient 1
+Denne pasienten har 4 FMDS registreringer. Koblingen til somatikk data viser
+hoveddiagnoser dvs. S00, S014, S018 og S060. Skal det være 1 eller 4
+skadetilfelle?
+
+```{r}
+cols1 <- c("lopenr", "helseforetak_nr", "innDato", "utDato", "Hastegrad", "hoveddiagnoser")
+cols2 <- c("lopenr", "helseforetak_nr", "alvorlighetsgrad", "skadeDato", "skadeMekanisme")
+
+dt2[lopenr == 1059447, ..cols2]
+dt1[lopenr == 1059447, ..cols1]
+```
+
+::: {.callout-note title="ICD-10"}
+S00-S09 Hodeskader
+:::
+
+## Pasient 2
+
+Denne pasienten har 2 FMDS registreringer
+
+```{r}
+dt2[lopenr == 1125315, ..cols2]
+dt1[lopenr == 1125315, ..cols1]
+```
+
+::: {.callout-note title="ICD-10"}
+S530 Dislokasjon av caput radii
+:::
+
+## Pasient 3
+
+Denne pasienten har 2 FMDS registreringer 
+
+```{r}
+dt2[lopenr == 399715, ..cols2]
+dt1[lopenr == 399715, ..cols1]
+```
+
+::: {.callout-note title="ICD-10"}
+S800 Kontusjon av kne <br/>
+S821 Brudd i proksimal ende av skinneben
+:::
+
