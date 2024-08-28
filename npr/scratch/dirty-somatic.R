@@ -1,10 +1,10 @@
 
 # Somatic
 # --------------
-## som <- fread("Data/02_extracted/23_31310_som_til_utlevering.csv")
-som <- fread("Data/02_extracted/20240422/24_01903_som_til_utlevering.csv", encoding = "Latin-1")
-fst::write_fst(som, "./Data/som2022og2023.fst")
-DT1 <- fst::read_fst("./Data/som2022og2023.fst", as.data.table = TRUE)
+som <- fread("Data/02_extracted/NPR20231213/23_31310_som_til_utlevering.csv")
+## som <- fread("Data/02_extracted/20240422/24_01903_som_til_utlevering.csv", encoding = "Latin-1")
+fst::write_fst(som, "./Data/som2023.fst")
+DT1 <- fst::read_fst("./Data/som203.fst", as.data.table = TRUE)
 DT1[, behandlingsstedNavn_alternativ := do_encode(behandlingsstedNavn_alternativ)]
 ## str(DT1)
 ## names(DT1)
