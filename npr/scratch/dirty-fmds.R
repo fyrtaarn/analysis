@@ -67,16 +67,23 @@ dd[lopenr == 390585]
 
 # ----------------------------
 # Function -------------
+
+sample(likeID[count == 2, c(lopenr)], 3)
+
 ## Test data
-valgID <- c(3, 45, 724355, 11947, 271, 249769, 50, 1198870, 4168, 119898)
+valgID <- c(3, 45, 685977, 724355, 11947, 271, 249769, 50, 1198870, 4168, 119898)
 # 4168 - 2 different dates with 1 day different and 2 RHF
 # 119898 - Trondheim Legevakt has 2 register but only 1 will be deleted.. strange
 valgCol <- c("lopenr", "helseforetak_nr", "skadeDato", "skadeTid")
 dtDato <- dt2[lopenr %in% valgID, ..valgCol]
-dtDato[15:16, skadeDato := as.IDate("2022-01-01")] # 3 same skadeDato
+# dtDato[15:16, skadeDato := as.IDate("2022-01-01")] # 3 same skadeDato
 dtDato
 
+
 # Round 1 -------
+
+# Row index duplicated skadeDato per lopenr
+dtDato[, .I][duplicated(dtDato, by = c("lopenr", "skadeDato")) | duplicated(dtDato, by = c("lopenr", "skadeDato"), fromLast = TRUE)]
 
 # dtDato[, x.id := .N, keyby = .(lopenr)] # select only those with one episode/lopenr ie. x.id == 1
 dtDato[, x.date1 := .N, keyby = .(lopenr, skadeDato)] # select x.date == 1
@@ -88,9 +95,12 @@ dtDato[x.date1 > 1, x.rhf11 := .N, by = .(lopenr, helseforetak_nr, skadeDato)]
 
 # Keep only the first skadeTid when similar date
 ## dxDato <- unique(dtDato, by = c("lopenr", "skadeDato", "helseforetak_nr"))
-(dupRows <- duplicated(dtDato, by = c("lopenr", "skadeDato", "helseforetak_nr")))
+## dupRows <- dtDato[, .I][duplicated(dtDato, by = c("lopenr", "skadeDato", "helseforetak_nr"))]
+dupRows <- which(duplicated(dtDato, by = c("lopenr", "skadeDato", "helseforetak_nr")))
 dtDato[dupRows, x.del1 := 1]
-dupIdx <- dtDato[dupRows, which = TRUE] #index to delete if needed
+
+# x.del1 == 1 to be deleted. Indicated similar helseforetak and date but at later time
+
 
 # Round 2 ------
 ## delCol <- grep("^x.*", names(dtDato), value = TRUE)

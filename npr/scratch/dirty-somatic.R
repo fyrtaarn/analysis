@@ -15,6 +15,8 @@ DT1[duplicated(DT1), .N]
 dt1 <- DT1[!duplicated(DT1)]
 dim(dt1)
 
+names(dt1)
+
 # Sort and line  number
 # dt1 <- dt1[order(innDato, lopenr)]
 setkey(dt1, lopenr, innDato)
