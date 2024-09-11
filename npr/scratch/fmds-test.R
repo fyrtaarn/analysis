@@ -20,6 +20,51 @@ setkey(fmd1, lopenr, skadeDato, skadeTid)
 
 # fmd1[33, helseforetak_nr := 945578564] #make it same date with 3 different times
 
+# Same Dates and Institution ---------------
+d1 <- copy(fmd1)
+d2 <- copy(smt1)
+
+keyFMDS <- c("lopenr", "skadeDato")
+keySOM <- c("lopenr", "innDato")
+
+data.table::setkeyv(d1, keyFMDS )
+data.table::setkeyv(d2, keySOM)
+
+## Identify patients in FMDS but not in somatic. These patients will be kept and joined later
+idfm <- d1[!duplicated(lopenr)][["lopenr"]]
+idsm <- d2[!duplicated(lopenr)][["lopenr"]]
+
+fmx <- setdiff(idfm, idsm)
+fmdx <- d1[lopenr %in% fmx]
+
+## Identify patients found in both but has different institution
+
+
+
+
+
+lnr <- "lineNo"
+# Needs linenumber to select cases
+if (!any(names(d1) == lnr)){
+  d1[, (lnr) := 1:.N]
+}
+
+# Identify FMDS patients that aren't in somatic dataset
+idSom <- d2[!duplicated(lopenr)][["lopenr"]]
+d1[!(lopenr %in% idSom), xx.fmds := 1L]
+dx <- d1[xx.fmds == 1L]
+d1 <- d1[is.na(xx.fmds)]
+
+selx <- d2[d1, nomatch = 0][helseforetak_nr == i.helseforetak_nr][[lnr]]
+d1[!lnr %in% selx, xx.DEL0 := 1L, by = lnr, env = list(lnr = lnr)]
+
+d1 <- data.table::rbindlist(list(d1, dx), fill = TRUE)
+d1[, (lnr) := NULL]
+data.table::setkeyv(d1, keyFMDS)
+
+
+
+
 # Round 1 -------
 # Condition: Duplicated SkadeDato and Institution
 # Solution: Keep earliest time only
