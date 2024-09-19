@@ -3,7 +3,7 @@ rm(list = ls())
 
 ## source("https://raw.githubusercontent.com/helseprofil/misc/main/utils.R")
 
-pkg <- c("pacman","data.table", "fst", "lubridate", "ggplot2", "plotly", "S7", "stringi")
+pkg <- c("pacman","data.table", "fst", "lubridate", "ggplot2", "plotly", "S7", "stringi", "summarytools")
 pacman::p_load(char = pkg)
 ## kh_load(char = pkg)
 
@@ -21,6 +21,8 @@ setkey(fmd1, lopenr, skadeDato, skadeTid)
 # fmd1[33, helseforetak_nr := 945578564] #make it same date with 3 different times
 
 # Same Dates and Institution ---------------
+# This is if selection is based on similar date in FMDS and Somatic ie. day = 0
+# Use to identify completness ie. how many injuries have FMSD
 d1 <- copy(fmd1)
 d2 <- copy(smt1)
 
@@ -30,19 +32,32 @@ keySOM <- c("lopenr", "innDato")
 data.table::setkeyv(d1, keyFMDS )
 data.table::setkeyv(d2, keySOM)
 
+# Needs linenumber to select cases
+lnr <- "lineNo"
+if (!any(names(d1) == lnr)){
+  d1[, (lnr) := 1:.N]
+}
+
 ## Identify patients in FMDS but not in somatic. These patients will be kept and joined later
 idfm <- d1[!duplicated(lopenr)][["lopenr"]]
 idsm <- d2[!duplicated(lopenr)][["lopenr"]]
 
 fmx <- setdiff(idfm, idsm)
-fmdx <- d1[lopenr %in% fmx]
 
-## Identify patients found in both but has different institution
+if (length(fmx) != 0)
+  fmdx <- d1[lopenr %in% fmx]
+
+# Keep only those match helseforetak and date (innDato and skadeDato)
+dt <- d2[d1, nomatch = 0][helseforetak_nr == i.helseforetak_nr]
+
+# Questions: Delete or keep for..
+# 1. Patients that has no somatikk registration ie. only in FMDS
+# 2. Patients that has not matched helseforetak and date (skadeDato and innDato)
 
 
 
 
-
+## ----------------------------------------------------------------------
 lnr <- "lineNo"
 # Needs linenumber to select cases
 if (!any(names(d1) == lnr)){
@@ -61,7 +76,6 @@ d1[!lnr %in% selx, xx.DEL0 := 1L, by = lnr, env = list(lnr = lnr)]
 d1 <- data.table::rbindlist(list(d1, dx), fill = TRUE)
 d1[, (lnr) := NULL]
 data.table::setkeyv(d1, keyFMDS)
-
 
 
 
@@ -207,3 +221,11 @@ dt2[sameDate == 1, .N, by = lopenr]
 
 dt2[lopenr == 1198870] #alle like dato
 dt2[lopenr == 11947] #like skadeTid
+
+
+
+isEmptyNumeric <- function(x) {
+  return(identical(x, numeric(0)))
+}
+
+dt2 <- find_case(fmd1, smt1)
