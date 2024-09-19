@@ -1,0 +1,246 @@
+---
+title: "FMDS første tertial 2024"
+lang: no
+language:
+    en:
+        crossref-fig-title: "Figure"
+    no:
+        crossref-fig-title: "Figur"
+format:
+  html:
+    toc: true
+    toc-title: Innhold
+    code-fold: true
+    code-summary: "Vis kode"
+    self-contained: true
+---
+
+`r format(Sys.Date(), "%d %B %Y")`
+
+```{r packages}
+#| output: false
+#| echo: false
+
+pkgs <- c("data.table", "fst", "lubridate", "ggplot2", "plotly", "S7", "stringi", "knitr", "gt")
+if(!require(pak)) install.packages("pacman")
+pacman::p_load(char = pkgs)
+```
+
+```{r oppsett}
+#| output: false
+#| echo: false
+#| cache: true
+
+fdrive <- "f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_"
+source("https://raw.githubusercontent.com/helseprofil/misc/main/utils.R")
+
+root <- "~/Git-fhi/analysis/npr"
+fx <- list.files(file.path(root, "functions"))
+for (i in fx)
+  source(file.path(root, "functions", i))
+
+# kodebok
+kb <- fread(file.path(fdrive, "Data/Kodebok_Skader_i_Norge.csv"), encoding = "Latin-1")
+
+# Somatikk
+somdt1 <- fread(file.path(fdrive,"Data/02_extracted/NPR20240711/24_01903_som_til_utlevering.csv"),
+                encoding = "Latin-1")
+somdt <- unique(somdt1)
+somdt[, yr := year(innDato)]
+somdt <- somdt[yr == 2024]
+setkey(somdt, lopenr, innDato)
+
+# FMDS
+fmddt1 <- fread(file.path(fdrive,"Data/02_extracted/NPR20240711/24_01903_fmds_til_utlevering.csv"),
+                encoding = "Latin-1")
+fmddt <- unique(fmddt1)
+fmddt[, yr  := year(skadeDato)]
+fmddt <- fmddt[yr == 2024]
+
+# fmddt[, tid := chron::times(skadeTid)]
+setkey(fmddt, lopenr, skadeDato, skadeTid)
+
+# Filter for fyrtårnenheter
+fmddt[Ft_dummy_Kommunal == 1 | Ft_dummy_Spesialist == 1, insFmd := 1]
+```
+
+
+# Fyrtårnenheter
+
+Antall pasienter med gylding personnr. i Fyrtårnenhetene
+
+```{r fmds-antall}
+#| output: false
+#| echo: false
+
+Nall <- nrow(fmddt[!is.na(lopenr)])
+Nfmd <- nrow(fmddt[!is.na(lopenr) & insFmd == 1])
+Nisna <- nrow(fmddt[is.na(lopenr) & insFmd == 1])
+Notfmd <- nrow(fmddt[!is.na(lopenr) & is.na(insFmd)])
+Nspec <- nrow(fmddt[!is.na(lopenr) & Ft_dummy_Spesialist == 1])
+Nkom <- nrow(fmddt[!is.na(lopenr) & Ft_dummy_Kommunal == 1])
+```
+
+|                            | N         |
+|----------------------------|-----------|
+| Antall pasienter           | `r Nall`  |
+| Antall pasienter (Fyrtårn) | `r Nfmd`  |
+| Antall missing (Fyrtårn)   | `r Nisna` |
+
+<br>
+Antall pasienter som ikke er fra fyrtårnenhetene med gylding personnr. er `r Notfmd`. 
+
+<br>
+
+|            | N         |
+|------------|-----------|
+| Spesialist | `r Nspec` |
+| Kommunal   | `r Nkom`  |
+
+# Alder
+
+
+```{r alder}
+#| echo: false
+
+# Gjør det enklere for filter
+dtFM <- fmddt[insFmd == 1]
+
+dtFM[fodtAar_FMDS > 0, ageFMDS := lubridate::year(skadeDato) - fodtAar]
+ageDT <- do_agegroup(dtFM[!is.na(lopenr)], "ageFMDS", c(0, 18, 25, 35, 45, 55, 65, 75, Inf), "agegp")
+
+ageDT <- ageDT[ageFMDS < 150] #can't be more than 150 yrs
+agegp <- show_pro(ageDT, "agegp")
+
+gt(agegp) |>
+  tab_header(title = "Aldergrupper")
+
+```
+
+# Skadested
+
+```{r sted}
+#| echo: false
+
+sted <- dtFM[, .N, by = skadeSted]
+stedTBL <- show_pro(dtFM[insFmd == 1], "skadeSted", kb)
+
+gt(stedTBL) |>
+  tab_header(title = "Skadested")
+
+```
+
+# Hardt skadd i trafikkulykker AIS 3+
+
+```{r}
+#| output: false
+#| echo: false
+
+skadeKB <- c("V1", "N")
+
+ais3 <- dtFM[kontaktarsakSkade == 1, ][ #Ulykkesskade
+  alvorlighetsgrad == 3][ #AIS 3+
+    skadeSted %in% skadeKB,]
+
+# Kjønn AIS3+
+kjonnTBL3 <- show_pro(ais3, "kjonn", kb)
+
+## # Alder AIS3+
+## ageTBL3 <- show_pro(ais3, "agegp")
+
+```
+
+## Kjønn
+
+```{r}
+#| echo: false
+
+gt(kjonnTBL3) |>
+  tab_header(title = "Kjønn AIS3+")
+```
+
+# Fremkomstmiddel
+
+```{r}
+#| output: false
+#| echo: false
+
+# Fremkomstmiddel AIS3+
+fremTBL3 <- show_pro(ais3, "fremkomstmiddel", kb)
+
+# Skademekanisme AIS3+
+mekTBL3 <- show_pro(ais3, "skadeMekanisme", kb)
+```
+
+```{r}
+#| echo: false
+
+gt(fremTBL3) |>
+  tab_header(title = "Fremkomstmiddel AIS3+")
+```
+
+# Skademekanisme
+
+```{r}
+#| echo: false
+
+gt(mekTBL3) |>
+  tab_header(title = "Skademekanisme AIS3+")
+```
+
+# Lettere skadd i trafikkulykker AIS 1 & 2 
+
+```{r}
+#| output: false
+#| echo: false
+
+skadeKB <- c("V1", "N")
+
+
+ais2 <- dtFM[kontaktarsakSkade == 1, ][ #Ulykkesskade
+  alvorlighetsgrad %in% 1:2][ #AIS 1 & 2
+    skadeSted %in% skadeKB]
+
+# Kjønn
+kjonnTBL2 <- show_pro(ais2, "kjonn", kb)
+
+```
+
+
+## Kjønn
+
+```{r}
+#| echo: false
+
+gt(kjonnTBL2) |>
+  tab_header(title = "Kjønn AIS 1&2")
+```
+
+# Fremkomstmiddel
+
+```{r}
+#| output: false
+#| echo: false
+
+# Fremkomstmiddel AIS3+
+fremTBL2 <- show_pro(ais2, "fremkomstmiddel", kb)
+
+# Skademekanisme AIS2+
+mekTBL2 <- show_pro(ais2, "skadeMekanisme", kb)
+```
+
+```{r}
+#| echo: false
+
+gt(fremTBL2) |>
+  tab_header(title = "Fremkomstmiddel AIS 1&2")
+```
+
+# Skademekanisme
+
+```{r}
+#| echo: false
+
+gt(mekTBL2) |>
+  tab_header(title = "Skademekanisme AIS 1&2")
+```
