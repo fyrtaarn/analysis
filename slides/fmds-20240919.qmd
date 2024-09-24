@@ -57,7 +57,7 @@ fmddt <- unique(fmddt1)
 fmddt[, yr  := year(skadeDato)]
 fmddt <- fmddt[yr == 2024]
 
-# fmddt[, tid := chron::times(skadeTid)]
+# fmddt[, tid := chron::times(skadeTid)] yq
 setkey(fmddt, lopenr, skadeDato, skadeTid)
 
 # Filter for fyrtårnenheter
@@ -136,7 +136,8 @@ gt(stedTBL) |>
 #| output: false
 #| echo: false
 
-skadeKB <- c("V1", "N")
+## skadeKB <- c("V1", "N")
+skadeKB <- c("V1")
 
 ais3 <- dtFM[kontaktarsakSkade == 1, ][ #Ulykkesskade
   alvorlighetsgrad == 3][ #AIS 3+
@@ -193,8 +194,6 @@ gt(mekTBL3) |>
 ```{r}
 #| output: false
 #| echo: false
-
-skadeKB <- c("V1", "N")
 
 
 ais2 <- dtFM[kontaktarsakSkade == 1, ][ #Ulykkesskade
