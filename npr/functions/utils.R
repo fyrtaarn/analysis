@@ -120,10 +120,12 @@ plot_dots <- function(dt, x, y){
 #' @examples
 #' show_pro(dx1, "hovdiag")
 #' show_pro(dt2, "fremkomstmiddel", kb)
-show_pro <- function(data, var, code = NULL){
+show_pro <- function(data, var, code = NULL, value = TRUE){
   dt <- data.table::copy(data)
   x <- dt[, .N, by = var, env = list(var = var)]
-  x[, sum := sum(N, na.rm = T)][, pro := round(100 * N/sum, 1), by = var, env = list(var = var)][, sum := NULL]
+  x[, sum := sum(N, na.rm = T)][, prosent := round(100 * N/sum, 1), by = var, env = list(var = var)][, sum := NULL]
+
+  bes <- "beskrivelse"
 
   if (!is.null(code)) {
     if (!is.character(x[, var, env = list(var = var)]))
@@ -131,19 +133,27 @@ show_pro <- function(data, var, code = NULL){
 
     data.table::setkeyv(x, var)
     data.table::setkey(code, kode)
-    x[code[variabel == var], beskrivelse := beskrivelse]
+    x[code[variabel == var], (bes) := beskrivelse]
   } else {
     data.table::setkeyv(x, var)
   }
 
-  tot <- x[, sum(N, na.rm = T)]
+  total <- "Total"
+    tot <- x[, sum(N, na.rm = T)]
   if (ncol(x) == 3){
-    tt <- list("Totalt", tot, 100)
+    tt <- list(total, tot, 100)
   } else {
-    tt <- list("Totalt", tot, 100, " ")
+    tt <- list(total, tot, 100, " ")
   }
 
   x <- rbindlist(list(x, tt))
+
+  if (!value){
+    x[, (var) := NULL]
+    data.table::setcolorder(x, c(bes, "N", "prosent"))
+    tx <- x[, .N]
+    x[tx, (bes) := total]
+  }
 
   return(x[])
 }
