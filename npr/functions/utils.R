@@ -137,7 +137,7 @@ show_pro <- function(data, var, code = NULL){
   }
 
   tot <- x[, sum(N, na.rm = T)]
-  x <- rbindlist(list(x, list("Totalt", tot, 100, " ")))
+  x <- rbindlist(list(x, list("Total", tot, 100, " ")))
 
   return(x[])
 }
