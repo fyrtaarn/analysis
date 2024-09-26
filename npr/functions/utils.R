@@ -136,6 +136,9 @@ show_pro <- function(data, var, code = NULL){
     data.table::setkeyv(x, var)
   }
 
+  tot <- x[, sum(N, na.rm = T)]
+  x <- rbindlist(list(x, list("Totalt", tot, 100, " ")))
+
   return(x[])
 }
 
