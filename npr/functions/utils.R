@@ -137,7 +137,13 @@ show_pro <- function(data, var, code = NULL){
   }
 
   tot <- x[, sum(N, na.rm = T)]
-  x <- rbindlist(list(x, list("Total", tot, 100, " ")))
+  if (ncol(x) == 3){
+    tt <- list("Totalt", tot, 100)
+  } else {
+    tt <- list("Totalt", tot, 100, " ")
+  }
+
+  x <- rbindlist(list(x, tt))
 
   return(x[])
 }
