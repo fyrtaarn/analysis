@@ -1,0 +1,31 @@
+---
+title: "Fotgjengere"
+subtitle: "Ulykker og skader"
+lang: no
+language: no-lang.yml
+toc: false
+format:
+  html:
+    code-fold: true
+    self-contained: true
+---
+
+Tallene som presenteres her er basert på data for første tertial 2024.
+
+```{r setup}
+#| output: false
+#| echo: false
+
+source(file.path(here::here(), "misc", "functions.R"))
+
+pkg <- c("data.table", "here")
+loadpkg(pkg)
+
+fnc <- "c:/Users/ybka/Git-fhi/analysis/npr/functions/utils.R"
+source(fnc)
+
+fdrive <- "f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_"
+
+# kodebok
+kb <- fread(file.path(fdrive, "Data/Kodebok_Skader_i_Norge.csv"), encoding = "Latin-1")
+```

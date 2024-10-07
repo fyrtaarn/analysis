@@ -1,0 +1,8 @@
+en:
+  crossref-fig-title: "Figure"
+  crossref-tbl-title: "Table"
+  related-formats-title: "Other Formats"
+no:
+  crossref-fig-title: "Figur"
+  crossref-tbl-title: "Tabell"
+  related-formats-title: "Annet format"
