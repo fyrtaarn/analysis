@@ -19,40 +19,6 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
-
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-{ counter-reset: source-line 0; }
-pre.numberSource code > span
-{ position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-{ content: counter(source-line);
-position: relative; left: -1em; text-align: right; vertical-align: baseline;
-border: none; display: inline-block;
--webkit-touch-callout: none; -webkit-user-select: none;
--khtml-user-select: none; -moz-user-select: none;
--ms-user-select: none; user-select: none;
-padding: 0 4px; width: 4em;
-}
-pre.numberSource { margin-left: 3em; padding-left: 4px; }
-div.sourceCode
-{ }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -3102,29 +3068,39 @@ vertical-align: -.125em;
 </header>
 
 
-<p>Tallene som presenteres her er basert på data for første tertial 2024.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">file.path</span>(here<span class="sc">::</span><span class="fu">here</span>(), <span class="st">&quot;misc&quot;</span>, <span class="st">&quot;functions.R&quot;</span>))</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pkg <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;data.table&quot;</span>, <span class="st">&quot;here&quot;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">loadpkg</span>(pkg)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>here() starts at C:/Users/ybka/Git-fhi/analysis</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>fnc <span class="ot">&lt;-</span> <span class="st">&quot;c:/Users/ybka/Git-fhi/analysis/npr/functions/utils.R&quot;</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(fnc)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>fdrive <span class="ot">&lt;-</span> <span class="st">&quot;f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_&quot;</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co"># kodebok</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>kb <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="fu">file.path</span>(fdrive, <span class="st">&quot;Data/Kodebok_Skader_i_Norge.csv&quot;</span>), <span class="at">encoding =</span> <span class="st">&quot;Latin-1&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<p>Tallene for fotgjengere som presenteres her er basert på data i FMDS for første tertial 2024. Pasienter med ugyldig personnummer er ekskludert (N = 925). <em>Fotgjengere</em> defineres når <strong>skadested</strong> oppgis som:</p>
+<ul>
+<li>Vei, gate, fortau, gang/sykkel - trafikkulykke, dvs. kjøretøy i bevegelse var innblandet, også sykkelvelt <em>(V1)</em></li>
+<li>Vei, gate, fortau, gang/sykkelvei - ikke trafikkulykke <em>(V2)</em></li>
+</ul>
+<p>Dersom <strong>skadested</strong> faller inn under en av disse kategoriene, skal <strong>skademekanisme</strong> være <em>annen fall</em> for å bli inkludert som ulykker for fotgjengere dvs. ikke <em>fall fra høyde, også i/fra trapp</em>.</p>
+<p>Antall hendelser for fotgjengere ulykker både <em>V1</em> og <em>V2</em> eller begge deler er som følgende:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th>Alle sykehus/legevakter</th>
+<th>Fyrtårn</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Alle</td>
+<td>6634</td>
+<td>5343</td>
+</tr>
+<tr class="even">
+<td>Trafikkulykker</td>
+<td>464</td>
+<td>343</td>
+</tr>
+<tr class="odd">
+<td>Ikke trafikkulykker</td>
+<td>6170</td>
+<td>5000</td>
+</tr>
+</tbody>
+</table>
 
 </main>
 <!-- /main column -->
