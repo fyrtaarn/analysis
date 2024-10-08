@@ -121,7 +121,7 @@ Antall hendelser for fotgjengere ulykker både *V1* og *V2* eller begge deler er
 
 <br>
 
-Kjønn og aldersfordeling er som følgende:
+Kjønn og aldersfordeling er som vises i @tbl-fot. Tallene er for både trafikkulykker og ikke trafikkulykker.
 
 ```{r gender-all}
 #| echo: false
