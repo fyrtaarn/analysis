@@ -127,8 +127,8 @@ Kjønn og aldersfordeling er som vises i @tbl-fot. Tallene er for både trafikku
 #| echo: false
 #| output: false
 
-var <- c("V1", "V2")
-DTall <- dtAlle[skadeSted %chin% var, env = list(var = I(var))][skadeMekanisme == "F2"]
+varx <- c("V1", "V2")
+DTall <- dtAlle[skadeSted %chin% varx, env = list(var = I(var))][skadeMekanisme == "F2"]
 
 sex3 <- show_pro(DTall, "kjonn", kb, value = F)
 sex3[, item := "Kjønn"]
@@ -151,8 +151,8 @@ dta[, grp := "Alle"]
 #| echo: false
 #| output: false
 
-var <- c("V1", "V2")
-DTfmd <- fdd[skadeSted %chin% var, env = list(var = I(var))][skadeMekanisme == "F2"]
+varx <- c("V1", "V2")
+DTfmd <- fdd[skadeSted %chin% varx, env = list(var = I(var))][skadeMekanisme == "F2"]
 
 sex2 <- show_pro(DTfmd, "kjonn", kb, value = F)
 sex2[, item := "Kjønn"]
