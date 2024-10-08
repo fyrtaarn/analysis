@@ -114,7 +114,7 @@ Antall hendelser for fotgjengere ulykker både *V1* og *V2* eller begge deler er
 
 |                     | Alle sykehus/legevakter | Fyrtårn         |
 |---------------------|-------------------------|-----------------|
-| Alle                | `r input[[1]]`          | `r inputx[[1]]` |
+| Begge                | `r input[[1]]`          | `r inputx[[1]]` |
 | Trafikkulykker      | `r input[[2]]`          | `r inputx[[2]]` |
 | Ikke trafikkulykker | `r input[[3]]`          | `r inputx[[3]]` |
 
