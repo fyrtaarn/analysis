@@ -8,6 +8,8 @@ format:
   html:
     code-fold: true
     self-contained: true
+  pdf:
+    toc: false
 ---
 
 
@@ -17,7 +19,7 @@ format:
 
 source(file.path(here::here(), "misc", "functions.R"))
 
-pkg <- c("data.table", "here")
+pkg <- c("data.table", "here", "gt", "stringr")
 loadpkg(pkg)
 
 fnc <- "c:/Users/ybka/Git-fhi/analysis/npr/functions/utils.R"
@@ -47,7 +49,6 @@ setkey(fmddt, lopenr, skadeDato, skadeTid)
 
 # Filter for fyrtårnenheter
 fmddt[Ft_dummy_Kommunal == 1 | Ft_dummy_Spesialist == 1, insFmd := 1]
-
 ```
 
 ```{r hendelse}
@@ -66,13 +67,14 @@ var2 <- c("V2") #ikke trafikkulykker
 
 fot <- list(vars, var1, var2)
 
-## Alle
+## Alle med gylding løpenr
+dtAlle <- fmddt[!is.na(lopenr)]
 input <- vector(mode = "list", length = 3)
 
 for (i in seq_len(3)){
   var <- fot[[i]]
   
-  x <- fmddt[skadeSted %chin% var, env = list(var = I(var))][skadeMekanisme == "F2"]
+  x <- dtAlle[skadeSted %chin% var, env = list(var = I(var))][skadeMekanisme == "F2"]
   n <- nrow(x)
 
   input[[i]] <- n
@@ -96,7 +98,7 @@ for (i in seq_len(3)){
 
 Tallene for fotgjengere som presenteres her er basert på data i FMDS for første
 tertial 2024. Pasienter med ugyldig personnummer er ekskludert
-(N = `r format(popna, big.mark = " ")`). *Fotgjengere* defineres når **skadested**
+(N = `r format(popna, big.mark = " ")`). Totalt antall registrerte skadehendelser ved alle sykehus og legevakter er `r format(tall, big.mark = " ")`, hvorav `r format(tallf, big.mark = " ")` ble registrert ved Fyrtårnenhetene. *Fotgjengere* defineres når **skadested**
 oppgis som:
 
 - Vei, gate, fortau, gang/sykkel - trafikkulykke, dvs. kjøretøy i bevegelse var
@@ -115,3 +117,89 @@ Antall hendelser for fotgjengere ulykker både *V1* og *V2* eller begge deler er
 | Alle                | `r input[[1]]`          | `r inputx[[1]]` |
 | Trafikkulykker      | `r input[[2]]`          | `r inputx[[2]]` |
 | Ikke trafikkulykker | `r input[[3]]`          | `r inputx[[3]]` |
+
+
+<br>
+
+Kjønn og aldersfordeling er som følgende:
+
+```{r gender-all}
+#| echo: false
+#| output: false
+
+var <- c("V1", "V2")
+DTall <- dtAlle[skadeSted %chin% var, env = list(var = I(var))][skadeMekanisme == "F2"]
+
+sex3 <- show_pro(DTall, "kjonn", kb, value = F)
+sex3[, item := "Kjønn"]
+sex3 <- sex3[beskrivelse != "Total", ]
+
+DTall[fodtAar_FMDS > 0, ageFMDS := lubridate::year(skadeDato) - fodtAar]
+agegp3 <- do_agegroup(DTall, "ageFMDS", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+
+age3 <- show_pro(agegp3, "agegp")
+data.table::setnames(age3, "agegp", "beskrivelse")
+age3[, item := "Alder"]
+age3 <- age3[beskrivelse != "Total"]
+
+dta <- rbindlist(list(sex3, age3))
+dta[, grp := "Alle"]
+
+```
+
+```{r gender-fmds}
+#| echo: false
+#| output: false
+
+var <- c("V1", "V2")
+DTfmd <- fdd[skadeSted %chin% var, env = list(var = I(var))][skadeMekanisme == "F2"]
+
+sex2 <- show_pro(DTfmd, "kjonn", kb, value = F)
+sex2[, item := "Kjønn"]
+sex2 <- sex2[beskrivelse != "Total"]
+
+DTfmd[fodtAar_FMDS > 0, ageFMDS := lubridate::year(skadeDato) - fodtAar]
+agegp2 <- do_agegroup(DTfmd, "ageFMDS", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+
+age2 <- show_pro(agegp2, "agegp")
+data.table::setnames(age2, "agegp", "beskrivelse")
+age2[, item := "Alder"]
+age2 <- age2[beskrivelse != "Total"]
+
+dtf <- rbindlist(list(sex2, age2))
+dtf[, grp := "Fyrtårn"]
+```
+
+```{r merge}
+#| echo: false
+#| label: tbl-fot
+#| tbl-cap: "Fotgjengere"
+
+dd <- rbindlist(list(dta, dtf))
+tbl <- dcast(dd, beskrivelse + item ~ grp, value.var = c("N", "prosent"))
+
+ordersty <- c("Kjønn", "Alder")
+tbl[, item := factor(item, levels = ordersty)]
+tbl <- tbl[order(item)]
+
+coln <- colnames(tbl) |>
+  str_remove('(_Alle|_Fyrtårn)') |>
+  str_to_title()
+names(coln) <- colnames(tbl)
+
+tbl |>
+  gt(groupname_col = 'item') |>
+  cols_label(.list = coln) |>
+  tab_spanner(
+    label = md('**Alle**'),
+    columns = contains("Alle")) |>
+  tab_spanner(
+    label = md('**Fyrtårn**'),
+    columns = contains("Fyrtårn")) |>
+  sub_zero(zero_text = "-") |>
+  tab_options(
+    data_row.padding = px(2),
+    row_group.padding = px(4)) |>
+  opt_stylize(style = 6, color = 'gray')
+
+```
