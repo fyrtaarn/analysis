@@ -19,7 +19,7 @@ format:
 
 source(file.path(here::here(), "misc", "functions.R"))
 
-pkg <- c("data.table", "here", "gt", "stringr")
+pkg <- c("data.table", "here", "gt", "stringr", "norgeo")
 loadpkg(pkg)
 
 fnc <- "c:/Users/ybka/Git-fhi/analysis/npr/functions/utils.R"
@@ -53,6 +53,9 @@ fmddt[Ft_dummy_Kommunal == 1 | Ft_dummy_Spesialist == 1, insFmd := 1]
 
 ```{r hendelse}
 #| echo: false
+
+## fmddt - all for first tertial 2024
+## fdd - Fyrtårn and valid personnr.
 
 fmd <- fmddt[insFmd == 1]
 fdd <- fmddt[!is.na(lopenr) & insFmd == 1]
@@ -200,6 +203,36 @@ tbl |>
   tab_options(
     data_row.padding = px(2),
     row_group.padding = px(4)) |>
+  opt_stylize(style = 6, color = 'gray')
+
+```
+
+Geografisk fordeling etter fylker.
+
+```{r geo}
+#| echo: false
+
+fk <- get_correspond("f", "k", 2024)
+
+fk[, fylke := as.integer(sourceCode)]
+fk[, kom := as.integer(targetCode)]
+
+v1 <- c("sourceName", "targetName", "fylke")
+
+DTall[fk, on = c(komNrSkade = "kom"), (v1) := mget(v1)]
+DTfmd[fk, on = c(komNrSkade = "kom"), (v1) := mget(v1)]
+
+tbl1 <- DTall[, .N, keyby = .(fylke, sourceName)]
+tbl2 <- DTfmd[, .N, keyby = .(fylke, sourceName)]
+
+setnames(tbl1, new = c("Kode", "Fylke", "Alle (N)"))
+setnames(tbl2, new = c("Kode", "Fylke", "Fyrtårn (N)"))
+
+tt <- tbl1[tbl2, on = "Kode"]
+tt[, "i.Fylke" := NULL]
+tt[is.na(Fylke), Fylke := "-"]
+
+gt(tt) |>
   opt_stylize(style = 6, color = 'gray')
 
 ```
