@@ -63,12 +63,17 @@ url <- "https://data.ssb.no/api/v0/no/table/07459/"
 komm <- get_code("kom", 2023)
 age <- c(1:150)
 
-dt <- ApiData2(url, Region = komm[["code"]], Kjonn = 1:2, Alder = age )
+## only codes
+dt <- ApiData2(url, Region = komm[["code"]], Kjonn = 1:2, Alder = age, Tid = "2023")
+## code and text
+dt12 <- ApiData12(url, Region = komm[["code"]], Kjonn = 1:2, Alder = age, Tid = "2023")
 setDT(dt)
+setDT(dt12)
 dt
+dt12
 
 dt[, .N, keyby = Alder]
-
+dt12[, .N, keyby = region]
 
 ### Try to use httr2 -----------
 # Define the URL and JSON body (assuming befolkJSON is already defined)
