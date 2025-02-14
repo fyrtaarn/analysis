@@ -9,6 +9,7 @@ pak::pkg_install("fyrtaarn/fyr")
 library(data.table)
 library(fst)
 library(fyr)
+library(skimr)
 
 root <- "f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_"
 
@@ -22,6 +23,17 @@ som[, Ft_Enhet_Spesialist := fyr:::is_encode(Ft_Enhet_Spesialist)]
 fmd[, let(year = year(skadeDato), month = month(skadeDato))]
 som[, let(year = year(innDato), month = month(innDato))]
 
+# Alder
+som[, age := year - fodselsar]
+fmd[, age := year - fodtAar]
+
+som <- do_agegroup(som, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+fmd <- do_agegroup(fmd, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+
+skim(som)
+skim(fmd)
+
+# Subset
 fmd23 <- fmd[year == 2023]
 som23 <- som[year == 2023]
 
@@ -36,8 +48,3 @@ dim(fm)
 
 show_pro(all, "kjonn")
 show_pro(fm, "kjonn")
-
-fmd23[, agegp := do_agegroup()]
-
-# Alder
-som[, age := lubridate::year(innDato) - fodselsar]
