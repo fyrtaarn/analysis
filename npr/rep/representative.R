@@ -3,8 +3,8 @@ fx <- list.files(file.path(froot, "functions"))
 for (i in fx)
   source(file.path(froot, "functions", i))
 
-if(!require(pak)) install.packages("pak")
-pak::pkg_install("fyrtaarn/fyr")
+## if(!require(pak)) install.packages("pak")
+## pak::pkg_install("fyrtaarn/fyr")
 
 library(data.table)
 library(fst)
@@ -24,11 +24,15 @@ fmd[, let(year = year(skadeDato), month = month(skadeDato))]
 som[, let(year = year(innDato), month = month(innDato))]
 
 # Alder
+fmd[, fodtMix := fifelse(is.na(fodtAar), fodtAar_FMDS, fodtAar)]
 som[, age := year - fodselsar]
-fmd[, age := year - fodtAar]
+fmd[, age := year - fodtMix]
 
 som <- do_agegroup(som, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
 fmd <- do_agegroup(fmd, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+
+som[, .N, keyby = agegp]
+fmd[, .N, keyby = agegp]
 
 skim(som)
 skim(fmd)
