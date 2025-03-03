@@ -6,8 +6,8 @@
 
 # FMDS
 # -----
-fmds <- fread("Data/02_extracted/NPR20240711/24_01903_fmds_til_utlevering.csv", encoding = "Latin-1")
-fst::write_fst(fmds, "./Data/fmds20240711.fst")
+#fmds <- fread("Data/02_extracted/NPR20240711/24_01903_fmds_til_utlevering.csv", encoding = "Latin-1")
+#fst::write_fst(fmds, "./Data/fmds20240711.fst")
 
 DT2 <- fst::read_fst("./Data/fmds20240711.fst", as.data.table = TRUE)
 DT2[, helseforetak_Navn := do_encode(helseforetak_Navn)]
@@ -34,6 +34,7 @@ lpn2 <- as.integer(gsub("^UFMDS", "", lpnxf))
 # 1. Hvis samme dato, velg nyeste tid
 # 2. Hvis forskjellige dato innen rimmelige grense eg. 3 dager, velg nyeste dato
 # 3. Hvis forskjellige helseforetak_nr, match på helseforetak_nr på somatikk data hvis det finnes
+# 4. De som har somatikk data, men ikke fmds blir rapportert som???
 likeID <- dt2[, .(count =.N), by = lopenr][order(count)]
 summary(likeID[!is.na(lopenr)]$count)
 likeID[, .N, keyby = count]
@@ -41,11 +42,15 @@ likeID[, .N, keyby = count]
 # Utfordinger
 # - Hvilken skal slettes? Match på helsefortak_nr fra somatikk
 # - Har 2 forskjellige inst, men finnes bare en inst i somatikk
-# - Lik dato men forskjellige skadetid
-# - Forskjell med får dager fra somtaikk til FMDS. Kan det være forsinkelse med registrering?
+# - Lik skadeDato, men forskjellige skadeTid
+# - Forskjell med bare noen få dager fra somtaikk til FMDS. Kan det være forsinkelse med registrering?
 
 cols1 <- c("lopenr", "helseforetak_nr", "innDato", "utDato", "Hastegrad", "hoveddiagnoser")
-cols2 <- c("lopenr", "helseforetak_nr", "helseforetak_Navn", "alvorlighetsgrad", "skadeDato", "skadeMekanisme")
+cols2 <- c("lopenr", "helseforetak_nr", "helseforetak_Navn",
+           "alvorlighetsgrad", "skadeTid", "skadeDato",
+           "alvorlighetsgrad", "skadeMekanisme")
+
+id1 <- sample(likeID[count == 1]$lopenr, 3)
 
 id2 <- sample(likeID[count == 2]$lopenr, 3)
 dt2[lopenr == id2[1], ..cols2]
@@ -122,6 +127,8 @@ dtDato[4:5, skadeDato := as.IDate("2024-01-16")] # 2 same skadeDato
 dtDato
 
 # Round 1 -------
+# Keep recent skadeTid when similar skadeDato
+setkey(dtDato, lopenr, skadeDato, skadeTid)
 
 # Find index for duplicated skadeDato per lopenr
 dtDato[,.I][duplicated(dtDato, by = c("lopenr", "skadeDato")) | duplicated(dtDato, by = c("lopenr", "skadeDato"), fromLast = T)]
@@ -275,76 +282,76 @@ dt1[lopenr == 1198144]
 
 
 # Er helseforetak_nr er like? ----------
-             dt2[]
+dt2[]
 
-             # Demografisk
-             dt2[!duplicated(lopenr), .N, by = kjonn]
+# Demografisk
+dt2[!duplicated(lopenr), .N, by = kjonn]
 
-             # Fødselsnummer
-             dt2[, .N, by = fodsNr_Gyldig] #6290 - ugyldig
-             dt2[!duplicated(lopenr), .N, by = fodsNr_Gyldig] #226507 og ikke 226508 som i brevet
+# Fødselsnummer
+dt2[, .N, by = fodsNr_Gyldig] #6290 - ugyldig
+dt2[!duplicated(lopenr), .N, by = fodsNr_Gyldig] #226507 og ikke 226508 som i brevet
 
-             dt2[lopenr == 679011]
-             dt2[lopenr == 998945] #finnes i somatikk men ikke fmds
-
-
-             # Fødselsår
-             diffAge <- dt2[!is.na(lopenr) & fodtAar_FMDS != fodtAar, .(lopenr, fodtAar_FMDS, fodtAar)]
-             diffAge[, diff := abs(fodtAar_FMDS - fodtAar)][]
-
-             dt2[lopenr == 92907] #Fødselsår fmds og kontrollert er veldig forskjell
-
-             dt2[lopenr == 1105092]
-
-             # Alder
-             dt2[, age := lubridate::year(skadeDato) - fodtAar]
-             dt2[fodtAar_FMDS > 0, ageFMDS := lubridate::year(skadeDato) - fodtAar_FMDS]
-
-             ## renset mot folkeregister
-             dtAge <- dt2[, .N, keyby = age]
-             dtAge[, summary(age)]
-             plot_dots(dtAge, age, N)
-
-             dtAge[age > 100, .N]
-             dtAge[age > 100,]
-
-             dt2[age == 142]
-             dt2[age == 123]
-             dt2[age == 119]
+dt2[lopenr == 679011]
+dt2[lopenr == 998945] #finnes i somatikk men ikke fmds
 
 
-             ## urenset
-             dtAgeFMDS <- dt2[, .N, keyby = ageFMDS]
-             dtAgeFMDS[, summary(ageFMDS)]
+# Fødselsår
+diffAge <- dt2[!is.na(lopenr) & fodtAar_FMDS != fodtAar, .(lopenr, fodtAar_FMDS, fodtAar)]
+diffAge[, diff := abs(fodtAar_FMDS - fodtAar)][]
 
-             plot_dots(dtAgeFMDS[ageFMDS < 2000], ageFMDS, N)
+dt2[lopenr == 92907] #Fødselsår fmds og kontrollert er veldig forskjell
 
-             dtAgeFMDS[ageFMDS > 100, .N]
-             dtAgeFMDS[ageFMDS > 100]
+dt2[lopenr == 1105092]
 
-             dt2[ageFMDS == 2023]
-             dt2[ageFMDS == 135]
-             dt2[ageFMDS == 122]
-             dt2[ageFMDS == 114]
-             dt2[ageFMDS == 112]
+# Alder
+dt2[, age := lubridate::year(skadeDato) - fodtAar]
+dt2[fodtAar_FMDS > 0, ageFMDS := lubridate::year(skadeDato) - fodtAar_FMDS]
 
-             dt2[is.na(fodtAar), .N]
-             dt2[is.na(age), .N]
+## renset mot folkeregister
+dtAge <- dt2[, .N, keyby = age]
+dtAge[, summary(age)]
+plot_dots(dtAge, age, N)
 
-             dt2[is.na(fodtAar_FMDS), .N]
-             dt2[is.na(ageFMDS), .N]
-             dt2[fodtAar_FMDS == 0, ]
+dtAge[age > 100, .N]
+dtAge[age > 100,]
 
-             dt2[is.na(age) & !is.na(ageFMDS)]
+dt2[age == 142]
+dt2[age == 123]
+dt2[age == 119]
 
-             # kontaktarsakSkade
-             dt2[!duplicated(lopenr), .N, by = kontaktarsakSkade]
 
-             # alvorlighetsgrad
-             dt2[!duplicated(lopenr), .N, by = alvorlighetsgrad]
+## urenset
+dtAgeFMDS <- dt2[, .N, keyby = ageFMDS]
+dtAgeFMDS[, summary(ageFMDS)]
 
-             # skadeSted
-             dt2[!duplicated(lopenr), .N, by = skadeSted]
+plot_dots(dtAgeFMDS[ageFMDS < 2000], ageFMDS, N)
 
-             # fremkomstmiddel
-             dt2[!duplicated(lopenr), .N, by = fremkomstmiddel]
+dtAgeFMDS[ageFMDS > 100, .N]
+dtAgeFMDS[ageFMDS > 100]
+
+dt2[ageFMDS == 2023]
+dt2[ageFMDS == 135]
+dt2[ageFMDS == 122]
+dt2[ageFMDS == 114]
+dt2[ageFMDS == 112]
+
+dt2[is.na(fodtAar), .N]
+dt2[is.na(age), .N]
+
+dt2[is.na(fodtAar_FMDS), .N]
+dt2[is.na(ageFMDS), .N]
+dt2[fodtAar_FMDS == 0, ]
+
+dt2[is.na(age) & !is.na(ageFMDS)]
+
+# kontaktarsakSkade
+dt2[!duplicated(lopenr), .N, by = kontaktarsakSkade]
+
+# alvorlighetsgrad
+dt2[!duplicated(lopenr), .N, by = alvorlighetsgrad]
+
+# skadeSted
+dt2[!duplicated(lopenr), .N, by = skadeSted]
+
+# fremkomstmiddel
+dt2[!duplicated(lopenr), .N, by = fremkomstmiddel]
