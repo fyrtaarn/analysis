@@ -12,6 +12,10 @@
 #'   more than one registered injuries of the same ICD-10 code. This is to avoid counting similar injuries more than once.
 #' @param diag.col Columname of codes for main diagnosis
 #' @return
+#' New columns are created:
+#' - `hovdiag` with logical value indicating main diagnosis code is any ICD-10 codes between S00 to T78
+#' - `day` indicates the difference in days from the previous injury report
+#' - `dup` represents a possible duplicated episode based on the selected `days`
 #' @examples
 #' dd <- find_episode(dt1, period = 1:2, acute = TRUE)
 #' dd <- find_episode(dt1, acute = TRUE, days = 3)
@@ -70,12 +74,12 @@ find_episode <- function(d, period = 0,
 #' @param d Dataset
 #' @param id Unque id
 #' @param col Column name for codes selection
-#' @param days Condition for selection eg. 3 or 5 days
+#' @param days Condition for selection eg. 3 or 5 days. Default is 3
 #' @return A dataset with extra columname ie. `dup`. When `dup == 1` indicates the row is duplicated
 #' with the specified period
 #' @examples
 #' dj <- check_codes(dx, "lopenr", "hoveddiagnoser", 3)
-check_codes <- function(d, id = "lopenr", col = "hoveddiagnoser", days){
+check_codes <- function(d, id = "lopenr", col = "hoveddiagnoser", days = 3){
 
   d[, dx := data.table::shift(x, fill = NA, type = "lag"), env = list(x = col)]
   d[, dup := data.table::fifelse(days <= dag & x == dx, 1, 0), by = .(y, x),
