@@ -63,7 +63,7 @@ show_pro(fm,"agegp")
 
 
 ## ICD10 Diagnoser
-
+## ----------------------------
 icd <- fyr::get_valid_codes(som, keep = TRUE)
 
 icd[, icd := fcase(icd_1 %chin% paste0("S0", 0:9), 0,
@@ -92,7 +92,8 @@ icd[, icd := fcase(icd_1 %chin% paste0("S0", 0:9), 0,
 
 
 icdkode <- data.table(kode = 0:17,
-                      diagnose = c("Hode",
+                      variabel = "icd",
+                      beskrivelse = c("Hode",
                                    "Hals",
                                    "Toraks",
                                    "Buk, nedre rygg",
@@ -110,3 +111,8 @@ icdkode <- data.table(kode = 0:17,
                                    "Forgiftning",
                                    "Toksiske virkninger",
                                    "Annet"))
+
+## Må være character for å kunne bruke som kodebok
+icdkode[, kode := as.character(kode)]
+
+show_pro(icd, "icd", code = icdkode)

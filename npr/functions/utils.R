@@ -24,12 +24,13 @@ get_valid_codes <- function(d, select.col = "hoveddiagnoser", create.col = "hovd
   cols <- paste0("temp", 1:max(dx$colnr))
   dx[, (cols) := data.table::tstrsplit(x = col1, " "), env = list(col1 = select.col)]
 
-  # Trim codes to keep only the first 3 digits
+  # Trim codes to keep only the first 3 digits since we don't need detail injury types
   for (j in cols){
     if(is.character(dx[[j]]))
       data.table::set(dx, j = j, value = substr(dx[[j]], 1, 3))
   }
 
+  # Recreate hoveddiagose as the original by keepin only 3 digits for control
   tempCol <- paste0(select.col, "01")
   dx[, (tempCol) := do.call(paste, c(replace(.SD, is.na(.SD), ""), sep = " ")), .SDcols = cols]
 
@@ -116,7 +117,9 @@ plot_dots <- function(dt, x, y){
 #' Calculate frequency and percent for selected variable
 #' @param data Dataset
 #' @param var Selected variable name to be calculated
-#' @param code Codebook to define the value in variable if needed. Default is NULL
+#' @param code Codebook to define the value in variable if needed.
+#'  The name of the columns must be `variabel` and `kode`, where
+#'  `variabel` is the label and `kode` is the value. Default is NULL
 #' @examples
 #' show_pro(dx1, "hovdiag")
 #' show_pro(dt2, "fremkomstmiddel", kb)
@@ -133,6 +136,10 @@ show_pro <- function(data, var, code = NULL, value = TRUE, sort = NULL){
 
     data.table::setkeyv(x, var)
     data.table::setkey(code, kode)
+
+    if (!is.character(code[, kode]))
+      code[, kode := as.character(kode)]
+
     x[code[variabel == var], (bes) := beskrivelse]
   } else {
     data.table::setkeyv(x, var)
