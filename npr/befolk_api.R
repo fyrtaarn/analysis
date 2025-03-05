@@ -1,3 +1,7 @@
+
+if(!require(pak)) install.packages("pak")
+pak::pkg_install("helseprofil/orgdata")
+
 library(httr2)
 library(jsonlite)
 
@@ -52,15 +56,17 @@ ds_kode <- sbtabell_kode[[1]]
 head(ds_kode)
 tail(ds_kode)
 
-## Using SSB recommended approach ---
+## Using SSB recommended approach
+## ------------------------------
 library(PxWebApiData)
 library(norgeo)
+library(orgdata)
 library(data.table)
 
 # Define the URL for the API endpoint
 url <- "https://data.ssb.no/api/v0/no/table/07459/"
 
-komm <- get_code("kom", 2023)
+komm <- norgeo::get_code("kom", 2023)
 age <- c(1:150)
 
 ## only codes
@@ -74,6 +80,12 @@ dt12
 
 dt[, .N, keyby = Alder]
 dt12[, .N, keyby = region]
+
+dt12[Alder %chin% "105+", Alder := 105][, age := as.integer(Alder)]
+dt12 <- do_agegroup(dt12, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+dt12[, .N, keyby = agegp]
+
+
 
 ### Try to use httr2 -----------
 # Define the URL and JSON body (assuming befolkJSON is already defined)
