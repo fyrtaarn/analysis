@@ -14,52 +14,76 @@ library(collapse)
 
 root <- "f:/Forskningsprosjekter/PDB 3327 - Skader i Norge analy_"
 
-fmd <- setDT(read_fst(file.path(root, "Data/fmds20240711.fst")))
-som <- setDT(read_fst(file.path(root, "Data/som20240711.fst")))
+fmd_raw <- setDT(read_fst(file.path(root, "Data/fmds20240711.fst")))
+som_raw <- setDT(read_fst(file.path(root, "Data/som20240711.fst")))
 
-fmd[, helseforetak_Navn := fyr:::is_encode(helseforetak_Navn)]
-som[, behandlingsstedNavn_alternativ := fyr:::is_encode(behandlingsstedNavn_alternativ)]
-som[, Ft_Enhet_Spesialist := fyr:::is_encode(Ft_Enhet_Spesialist)]
+fmd_raw[, helseforetak_Navn := fyr:::is_encode(helseforetak_Navn)]
+som_raw[, behandlingsstedNavn_alternativ := fyr:::is_encode(behandlingsstedNavn_alternativ)]
+som_raw[, Ft_Enhet_Spesialist := fyr:::is_encode(Ft_Enhet_Spesialist)]
 
-fmd[, let(year = year(skadeDato), month = month(skadeDato))]
-som[, let(year = year(innDato), month = month(innDato))]
+# Trenger år for å velge årgang data
+fmd_raw[, let(year = year(skadeDato), month = month(skadeDato))]
+som_raw[, let(year = year(innDato), month = month(innDato))]
 
 # Alder
-fmd[, fodtMix := fifelse(is.na(fodtAar), fodtAar_FMDS, fodtAar)]
-som[, age := year - fodselsar]
-fmd[, age := year - fodtMix]
+fmd_raw[, fodtMix := fifelse(is.na(fodtAar), fodtAar_FMDS, fodtAar)]
+som_raw[, age := year - fodselsar]
+fmd_raw[, age := year - fodtMix]
 
-som <- do_agegroup(som, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
-fmd <- do_agegroup(fmd, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+som_raw <- do_agegroup(som_raw, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
+fmd_raw <- do_agegroup(fmd_raw, "age", c(0, 15, 25, 45, 65, 80, Inf), "agegp")
 
-som[, .N, keyby = agegp]
-fmd[, .N, keyby = agegp]
+som_raw[, .N, keyby = agegp]
+fmd_raw[, .N, keyby = agegp]
 
-skimr::skim(som)
-skimr::skim(fmd)
+skimr::skim(som_raw)
+skimr::skim(fmd_raw)
 
-collapse::descr(som)
-as.data.table(descr(som))
+collapse::descr(som_raw)
+as.data.table(descr(som_raw))
 
 
-# Subset
-fmd23 <- fmd[year == 2023]
-som23 <- som[year == 2023]
+# Subset 2023
+# ------------
+FMD23 <- fmd_raw[year == 2023]
+SOM23 <- som_raw[year == 2023]
 
-caseN0 <- count_case(som23, acute=T)
-caseN3 <- count_case(som23, days = 3, acute=T)
+## fwrite(FMD23, "fmd23.csv")
+## fwrite(SOM23, "som23.csv")
 
-all <- caseN3[!is.na(lopenr) & dup != 1,]
-fm <- caseN3[!is.na(lopenr) & dup != 1 & Ft_dummy_Spesialist == 1, ]
+som23 <- SOM23[!is.na(lopenr)]
+fmd23 <- FMD23[!is.na(lopenr)]
 
-dim(all)
-dim(fm)
+caseN0all <- count_case(som23, acute=T)
+caseN3all <- count_case(som23, days = 3, acute=T)
 
-show_pro(all, "kjonn")
-show_pro(all,"agegp")
+caseN0 <- count_case(som23[Ft_dummy_Spesialist == 1,], acute=T)
+caseN3 <- count_case(som23[Ft_dummy_Spesialist == 1,], days = 3, acute=T)
 
-show_pro(fm, "kjonn")
-show_pro(fm,"agegp")
+caseN3all[, .N, keyby = dup]
+caseN3[, .N, keyby = dup]
+
+som1 <- caseN3all[dup == 0]
+som2 <- caseN3[dup == 0]
+
+kbb <- data.table(variabel = "kjonn", beskrivelse = c("Mann", "Kvinne"), kode = 1:2)
+
+lapply(list(som1, som2), show_pro, "kjonn", kbb)
+lapply(list(som1, som2), show_pro, "agegp")
+
+ageMen <- lapply(list(som1[kjonn == 1], som2[kjonn==1]), show_pro, "agegp") #mann
+ageMen <- setNames(ageMen, c("Alle", "Fyrtårn"))
+ageMen[[1]][, let(var = "Alle", kjonn = "Men")]
+ageMen[[2]][, let(var = "Alle", kjonn = "Men")]
+ageM <- rbindlist(ageMen)
+
+ageKvn <- lapply(list(som1[kjonn == 2], som2[kjonn==2]), show_pro, "agegp") #kvinne
+ageKvn <- setNames(ageKvn, c("Alle", "Fyrtårn"))
+ageKvn[[1]][, let(var = "Alle", kjonn = "Kvinner")]
+ageKvn[[2]][, let(var = "Alle", kjonn = "Kvinner")]
+ageK <- rbindlist(ageKvn)
+
+
 
 
 ## ICD10 Diagnoser
