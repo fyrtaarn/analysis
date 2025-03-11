@@ -6,3 +6,6 @@ Different codes
 - `./npr/merge-files.R` : Kobling av somatikk og FMDS filer
 - `./data/ICD10codes.RDS` er ICD-10 koder hentet fra [GitHub](https://raw.githubusercontent.com/k4m1113/ICD-10-CSV/master/codes.csv)
 - `./data/validCodes.RDS` er utvalgte koder som skal brukes i analysen for Fyrtårnprosjektet
+
+# Misc
+- Skader og ulykker bland [fotgjengere](https://fyrtaarn.github.io/analysis/pedestrian)
