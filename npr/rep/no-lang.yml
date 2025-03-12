@@ -1,0 +1,12 @@
+en:
+  crossref-fig-title: "Figure"
+  crossref-tbl-title: "Table"
+  related-formats-title: "Other Formats"
+  toc-title-document: "Table of contents"
+  toc-title-website: "On this page"
+no:
+  crossref-fig-title: "Figur"
+  crossref-tbl-title: "Tabell"
+  related-formats-title: "Annet format"
+  toc-title-document: "Innhold"
+  toc-title-website: "På denne siden"

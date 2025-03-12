@@ -3,7 +3,7 @@ title: "Representativitet for 2023 data"
 subtitle: "Fyrtårnprosjektet"
 lang: no
 language: no-lang.yml
-toc: false
+toc: true 
 format:
   html:
     code-fold: true
