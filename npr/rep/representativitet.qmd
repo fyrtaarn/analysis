@@ -1,5 +1,5 @@
 ---
-title: "Representativitet"
+title: "Representativitet for 2023 data"
 subtitle: "Fyrtårnprosjektet"
 lang: no
 language: no-lang.yml
@@ -14,17 +14,17 @@ format:
 #| output: false
 #| echo: false
 
-pkgs <- c("data.table", "fst", "fyr", "ggplot2", "collapse")
+pkgs <- c("data.table", "fst", "fyr", "ggplot2", "gt")
 if(!require(pak)) install.packages("pacman")
 pacman::p_load(char = pkgs)
 
-root <- "~/Git-fhi/analysis/npr/rep"
+root <- "~/Git-fhi/analysis/npr"
 fx <- list.files(file.path(root, "functions"))
 for (i in fx)
   source(file.path(root, "functions", i))
 
-FMD <- data.table::fread(file.path(root, "fmd23.csv"))
-SOM <- data.table::fread(file.path(root, "som23.csv"))
+FMD <- data.table::fread(file.path(root, "rep/fmd23.csv"))
+SOM <- data.table::fread(file.path(root, "rep/som23.csv"))
 
 som23 <- SOM[!is.na(lopenr)]
 fmd23 <- FMD[!is.na(lopenr)]
@@ -34,6 +34,13 @@ case3 <- fyr::count_case(som23[Ft_dummy_Spesialist == 1,], days = 3, acute=T)
 
 DT <- caseAll[dup == 0]
 dt <- case3[dup == 0]
+
+## kodebok
+kbb <- data.table(variabel = "kjonn", beskrivelse = c("Mann", "Kvinne"), kode = 1:2)
+
+kjonn <- lapply(list(DT, dt), show_pro, "kjonn", kbb)
+kjonn <- lapply(list(DT, dt), show_pro, "kjonn", kbb) #må kjøres 2 ganger pga. kodebok
+age <- lapply(list(DT, dt), show_pro, "agegp")
 ```
 
 Nye tilfeller av personskader innen aktivitetsdata for somatikk velges ut på denne måten:
@@ -43,5 +50,26 @@ Nye tilfeller av personskader innen aktivitetsdata for somatikk velges ut på de
  - Start av behandling for skadetilfellet i 2023.
  - Planlagt (elektiv) behandling er holdt utenfor.
 
-Et skadetilfelle kan generere flere kontakter med helsevesenet. For å unngå å telle hvert skadetilfelle flere ganger, skal samme skade ikke være mindre enn **3 dager** fra forrige registreringsdato (`innDato`) og at kontakten må være registrert med akutt hastegrad. Dersom pasienten er registrert med flere slike opphold for samme skade på mer enn 3 dager fra forrige registreringsdato, kan samme skade bli telt flere ganger. Det er **`r format(nrow(DT), big.mark = " ")`** skadetilfeller ble registeret i 2023 i hele landet hvor **`r format(nrow(dt), big.mark = " ")`** skadetilfeller er rapportert fra Fyrtårn enhetene.
+Et skadetilfelle kan generere flere kontakter med helsevesenet. For å unngå å telle hvert skadetilfelle flere ganger, skal samme skade ikke være mindre enn **3 dager** fra forrige registreringsdato (`innDato`) og at kontakten må være registrert med akutt hastegrad. Dersom pasienten er registrert med flere slike opphold for samme skade på mer enn 3 dager fra forrige registreringsdato, kan samme skade bli telt flere ganger. Det er **`r format(nrow(DT), big.mark = " ")`** skadetilfeller ble registeret i 2023 i hele landet hvor **`r format(nrow(dt), big.mark = " ")`** skadetilfeller er rapportert fra Fyrtårnenhetene.
 
+## Kjønn
+
+Kjønnsfordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
+
+```{r}
+#| echo: false
+#| label: tbl-kjonnAll
+#| tbl-cap: "Alle sykehusene og legevakter"
+
+gt(kjonn[[1]]) |>
+  opt_stylize(style = 6, color = 'gray')
+```
+
+```{r}
+#| echo: false
+#| label: tbl-kjonnFyr
+#| tbl-cap: "Fyrtårn sykehusene og legevakter"
+
+gt(kjonn[[2]]) |>
+  opt_stylize(style = 6, color = 'gray')
+```
