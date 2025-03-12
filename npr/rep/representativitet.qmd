@@ -31,6 +31,9 @@ fmd23 <- FMD[!is.na(lopenr)]
 
 caseAll <- fyr::count_case(som23, days = 3, acute = T)
 case3 <- fyr::count_case(som23[Ft_dummy_Spesialist == 1,], days = 3, acute=T)
+
+DT <- caseAll[dup == 0]
+dt <- case3[dup == 0]
 ```
 
 Nye tilfeller av personskader innen aktivitetsdata for somatikk velges ut på denne måten:
@@ -40,5 +43,5 @@ Nye tilfeller av personskader innen aktivitetsdata for somatikk velges ut på de
  - Start av behandling for skadetilfellet i 2023.
  - Planlagt (elektiv) behandling er holdt utenfor.
 
-Et skadetilfelle kan generere flere kontakter med helsevesenet. For å unngå å telle hvert skadetilfelle flere ganger, skal samme skade ikke være mindre enn **3 dager** fra forrige registreringsdato (`innDato`) og at kontakten må være registrert med akutt hastegrad. Dersom pasienten er registrert med flere slike opphold for samme skade på mer enn 3 dager fra forrige registreringsdato, kan samme skade bli telt flere ganger. Det er **`r format(nrow(caseAll), big.mark = " ")`** skadetilfeller ble registeret i 2023 i hele landet hvor **`r format(nrow(case3), big.mark = " ")`** skadetilfeller er rapportert fra Fyrtårn enhetene.
+Et skadetilfelle kan generere flere kontakter med helsevesenet. For å unngå å telle hvert skadetilfelle flere ganger, skal samme skade ikke være mindre enn **3 dager** fra forrige registreringsdato (`innDato`) og at kontakten må være registrert med akutt hastegrad. Dersom pasienten er registrert med flere slike opphold for samme skade på mer enn 3 dager fra forrige registreringsdato, kan samme skade bli telt flere ganger. Det er **`r format(nrow(DT), big.mark = " ")`** skadetilfeller ble registeret i 2023 i hele landet hvor **`r format(nrow(dt), big.mark = " ")`** skadetilfeller er rapportert fra Fyrtårn enhetene.
 
