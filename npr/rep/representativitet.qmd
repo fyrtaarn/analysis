@@ -73,3 +73,26 @@ gt(kjonn[[1]]) |>
 gt(kjonn[[2]]) |>
   opt_stylize(style = 6, color = 'gray')
 ```
+
+## Alder
+
+Aldersfordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
+
+
+```{r}
+#| echo: false
+#| label: tbl-alderAll
+#| tbl-cap: "Alle sykehusene og legevakter"
+
+gt(age[[1]]) |>
+  opt_stylize(style = 6, color = 'gray')
+```
+
+```{r}
+#| echo: false
+#| label: tbl-alderFyr
+#| tbl-cap: "Fyrtårn sykehusene og legevakter"
+
+gt(age[[2]]) |>
+  opt_stylize(style = 6, color = 'gray')
+```
