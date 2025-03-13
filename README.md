@@ -9,3 +9,4 @@ Different codes
 
 # Misc
 - Skader og ulykker bland [fotgjengere](https://fyrtaarn.github.io/analysis/pedestrian)
+- [Representativitet](https://fyrtaarn.github.io/analysis/representativitet) analyse
