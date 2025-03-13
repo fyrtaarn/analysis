@@ -123,10 +123,10 @@ plot_dots <- function(dt, x, y){
 #' @examples
 #' show_pro(dx1, "hovdiag")
 #' show_pro(dt2, "fremkomstmiddel", kb)
-show_pro <- function(data, var, code = NULL, value = TRUE, sort = NULL){
+show_pro <- function(data, var, code = NULL, value = TRUE, sort = NULL, digits = 1){
   dt <- data.table::copy(data)
   x <- dt[, .N, by = var, env = list(var = var)]
-  x[, sum := sum(N, na.rm = T)][, prosent := round(100 * N/sum, 1), by = var, env = list(var = var)][, sum := NULL]
+  x[, sum := sum(N, na.rm = T)][, prosent := round(100 * N/sum, digits = digits), by = var, env = list(var = var)][, sum := NULL]
 
   bes <- "beskrivelse"
 
