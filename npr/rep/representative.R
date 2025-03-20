@@ -45,14 +45,42 @@ as.data.table(descr(som_raw))
 
 # Subset 2023
 # ------------
-FMD23 <- fmd_raw[year == 2023]
-SOM23 <- som_raw[year == 2023]
+
+pkgs <- c("data.table", "fst", "fyr", "ggplot2", "gt")
+if(!require(pak)) install.packages("pacman")
+pacman::p_load(char = pkgs)
+
+root <- "~/Git-fhi/analysis/npr"
+fx <- list.files(file.path(root, "functions"))
+for (i in fx)
+  source(file.path(root, "functions", i))
+
+## FMD23 <- fmd_raw[year == 2023]
+## SOM23 <- som_raw[year == 2023]
 
 ## fwrite(FMD23, "fmd23.csv")
 ## fwrite(SOM23, "som23.csv")
 
-som23 <- SOM23[!is.na(lopenr)]
-fmd23 <- FMD23[!is.na(lopenr)]
+FMD <- data.table::fread(file.path(root, "rep/fmd23.csv"))
+SOM <- data.table::fread(file.path(root, "rep/som23.csv"))
+
+som23 <- SOM[!is.na(lopenr)]
+fmd23 <- FMD[!is.na(lopenr)]
+
+caseAll <- fyr::count_case(som23, days = 3, acute = T)
+case3 <- fyr::count_case(som23[Ft_dummy_Spesialist == 1,], days = 3, acute=T)
+
+DT <- caseAll[dup == 0]
+dt <- case3[dup == 0]
+
+## kodebok
+kbb <- data.table(variabel = "kjonn", beskrivelse = c("Mann", "Kvinne"), kode = 1:2)
+
+fmAll <- fyr::find_cause(fmd23, som23)
+
+
+som23 <- SOM[!is.na(lopenr)]
+fmd23 <- FMD[!is.na(lopenr)]
 
 caseN0all <- count_case(som23, acute=T)
 caseN3all <- count_case(som23, days = 3, acute=T)

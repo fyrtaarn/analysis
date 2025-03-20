@@ -16,7 +16,7 @@ format:
 #| output: false
 #| echo: false
 
-pkgs <- c("data.table", "fst", "fyr", "ggplot2", "gt")
+pkgs <- c("data.table", "fst", "fyr", "ggplot2", "gt", "rreg")
 if(!require(pak)) install.packages("pacman")
 pacman::p_load(char = pkgs)
 
@@ -76,6 +76,27 @@ gt(kjonn[[2]]) |>
   opt_stylize(style = 6, color = 'gray')
 ```
 
+```{r}
+#| echo: false
+#| warning: false
+#| label: fig-kjonnFyr
+#| fig-cap: "Kjønnsfordelingen av skadepasienter"
+
+cols <- names(kjonn[[1]])
+kjonn[[1]] <- setNames(kjonn[[1]], paste(cols, "all", sep ="_"))
+kjonn[[2]] <- setNames(kjonn[[2]], paste(cols, "fyr", sep ="_"))
+
+gender <- merge(kjonn[[1]], kjonn[[2]], by.x = "kjonn_all", by.y = "kjonn_fyr")
+gender <- gender[1:2,]
+
+rreg::regcom(gender, x = "beskrivelse_all",
+             yl = "prosent_fyr", yc = "prosent_all",
+             lab1 = "Fyrtrn", lab2 = "Alle",
+             leg1 = "Fyrtrn", leg2 = "Alle",
+             title = "Kjønnsfordelingen av skadepasienter")
+
+```
+
 ## Alder
 
 Aldersfordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
@@ -99,97 +120,42 @@ gt(age[[2]]) |>
   opt_stylize(style = 6, color = 'gray')
 ```
 
-## Diagnoser
-
-Diagnosefordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
-
 ```{r}
-#| output: false
 #| echo: false
+#| warning: false
+#| label: fig-alderFyr
+#| fig-cap: "Andel aldersfordelingen av skadepasienter"
 
-icdAll <- fyr::get_valid_codes(DT, keep = TRUE)
-icd <- fyr::get_valid_codes(dt, keep = TRUE)
+cols <- names(age[[1]])
+age[[1]] <- setNames(age[[1]], paste(cols, "all", sep ="_"))
+age[[2]] <- setNames(age[[2]], paste(cols, "fyr", sep ="_"))
 
-icdAll[, icd := fcase(icd_1 %chin% paste0("S0", 0:9), 0,
-                   icd_1 %chin% paste0("S1", 0:9), 1,
-                   icd_1 %chin% paste0("S2", 0:9), 2,
-                   icd_1 %chin% paste0("S3", 0:9), 3,
-                   icd_1 %chin% paste0("S4", 0:9), 4,
-                   icd_1 %chin% paste0("S5", 0:9), 5,
-                   icd_1 %chin% paste0("S6", 0:9), 6,
-                   icd_1 %chin% paste0("S7", 0:9), 7,
-                   icd_1 %chin% paste0("S8", 0:9), 8,
-                   icd_1 %chin% paste0("S9", 0:9), 9,
-                   icd_1 %chin% paste0("T0", 0:7), 10,
-                   icd_1 %chin% paste0("T0", 8:9), 11, #Uspesifisert
-                   icd_1 %chin% paste0("T", 10:14), 11, #Uspesifisert
-                   icd_1 %chin% paste0("T1", 5:9), 12, # Fremmedlegeme
-                   icd_1 %chin% paste0("T2", 0:9), 13, #Brannskader
-                   icd_1 %chin% paste0("T3", 0:2), 13, #Brannskader
-                   icd_1 %chin% paste0("T3", 3:5), 14, #Frostskade
-                   icd_1 %chin% paste0("T4", c(1, "n")), 15, #Forgiftning
-                   icd_1 %chin% "T50", 15, #Forgiftning
-                   icd_1 %chin% paste0("T5", 1:9), 16, #Toksiske virkninger
-                   icd_1 %chin% paste0("T6", 0:5), 16, #Toksiske virkninger
-                   icd_1 %chin% paste0("T6", 6:9), 17, #Annet
-                   icd_1 %chin% paste0("T7", 0:8), 17 #Annet
-                   )]
+alder <- merge(age[[1]], age[[2]], by.x = "agegp_all", by.y = "agegp_fyr")
+rowDel <- nrow(alder) - 1
+alder <- alder[1:rowDel, ]
+alder[, nr := 1:.N]
+alder <- alder[order(nr, decreasing = T)]
 
-
-icd[, icd := fcase(icd_1 %chin% paste0("S0", 0:9), 0,
-                   icd_1 %chin% paste0("S1", 0:9), 1,
-                   icd_1 %chin% paste0("S2", 0:9), 2,
-                   icd_1 %chin% paste0("S3", 0:9), 3,
-                   icd_1 %chin% paste0("S4", 0:9), 4,
-                   icd_1 %chin% paste0("S5", 0:9), 5,
-                   icd_1 %chin% paste0("S6", 0:9), 6,
-                   icd_1 %chin% paste0("S7", 0:9), 7,
-                   icd_1 %chin% paste0("S8", 0:9), 8,
-                   icd_1 %chin% paste0("S9", 0:9), 9,
-                   icd_1 %chin% paste0("T0", 0:7), 10,
-                   icd_1 %chin% paste0("T0", 8:9), 11, #Uspesifisert
-                   icd_1 %chin% paste0("T", 10:14), 11, #Uspesifisert
-                   icd_1 %chin% paste0("T1", 5:9), 12, # Fremmedlegeme
-                   icd_1 %chin% paste0("T2", 0:9), 13, #Brannskader
-                   icd_1 %chin% paste0("T3", 0:2), 13, #Brannskader
-                   icd_1 %chin% paste0("T3", 3:5), 14, #Frostskade
-                   icd_1 %chin% paste0("T4", c(1, "n")), 15, #Forgiftning
-                   icd_1 %chin% "T50", 15, #Forgiftning
-                   icd_1 %chin% paste0("T5", 1:9), 16, #Toksiske virkninger
-                   icd_1 %chin% paste0("T6", 0:5), 16, #Toksiske virkninger
-                   icd_1 %chin% paste0("T6", 6:9), 17, #Annet
-                   icd_1 %chin% paste0("T7", 0:8), 17 #Annet
-                   )]
-
-
-## Kodebok må ha disse 3 variablene
-icdkode <- data.table(kode = 0:17,
-                      variabel = "icd",
-                      beskrivelse = c("Hode",
-                                   "Hals",
-                                   "Toraks",
-                                   "Buk, nedre rygg",
-                                   "Skulder, overarm",
-                                   "Albu, underarm",
-                                   "Håndledd, hånd",
-                                   "Hofte, lår",
-                                   "Kne, legg",
-                                   "Ankel, fot",
-                                   "Multiple",
-                                   "Uspesifisert",
-                                   "Fremmedlegeme",
-                                   "Brannskader",
-                                   "Forstskade",
-                                   "Forgiftning",
-                                   "Toksiske virkninger",
-                                   "Annet"))
-
-icdOut <- lapply(list(icdAll,icd), show_pro, "icd", code = icdkode, digits = 2)
+rreg::regcom(alder, x = "agegp_all",
+             yl = "prosent_fyr", yc = "prosent_all",
+             lab1 = "Fyrtrn", lab2 = "Alle",
+             leg1 = "Fyrtrn", leg2 = "Alle",
+             ascending = FALSE,
+             title = "Andel aldersfordelingen av skadepasienter")
 
 ```
 
 
- 
+## Diagnoser
+
+Diagnosefordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
+
+```{r diagnose, file="diagnose.R"}
+#| output: false
+#| echo: false
+
+```
+
 
 ```{r}
 #| echo: false
@@ -207,4 +173,28 @@ gt(icdOut[[1]]) |>
 
 gt(icdOut[[2]]) |>
   opt_stylize(style = 6, color = 'gray')
+```
+
+```{r}
+#| echo: false
+#| label: fig-icd
+#| warning: false
+#| fig-cap: "Andel diagnoserfordeling av skadepasienter"
+
+cols <- names(icdOut[[1]])
+icdOut[[1]] <- setNames(icdOut[[1]], paste(cols, "all", sep ="_"))
+icdOut[[2]] <- setNames(icdOut[[2]], paste(cols, "fyr", sep ="_"))
+
+icdTbl <- merge(icdOut[[1]], icdOut[[2]], by.x = "icd_all", by.y = "icd_fyr")
+rowDel <- nrow(icdTbl) - 1
+icdTbl <- icdTbl[1:rowDel, ]
+icdTbl[, nr := 1:.N]
+icdTbl <- icdTbl[order(nr, decreasing = T)]
+
+rreg::regcom(icdTbl, x = "beskrivelse_all",
+             yl = "prosent_fyr", yc = "prosent_all",
+             lab1 = "Fyrtrn", lab2 = "Alle",
+             leg1 = "Fyrtrn", leg2 = "Alle",
+             ascending = TRUE,
+             title = "Andel diagnoserfordeling av skadepasienter")
 ```
