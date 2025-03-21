@@ -67,6 +67,9 @@ gt(kjonn[[1]]) |>
   opt_stylize(style = 6, color = 'gray')
 ```
 
+{{< pagebreak >}}
+
+
 ```{r}
 #| echo: false
 #| label: tbl-kjonnFyr
@@ -96,6 +99,8 @@ rreg::regcom(gender, x = "beskrivelse_all",
              title = "Kjønnsfordelingen av skadepasienter")
 
 ```
+
+{{< pagebreak >}}
 
 ## Alder
 
@@ -145,6 +150,7 @@ rreg::regcom(alder, x = "agegp_all",
 
 ```
 
+{{< pagebreak >}}
 
 ## Diagnoser
 
@@ -180,6 +186,10 @@ gt(icdOut[[2]]) |>
 #| label: fig-icd
 #| warning: false
 #| fig-cap: "Andel diagnoserfordeling av skadepasienter"
+#| fig-height: 7
+#| fig-width: 7
+#| fig-format: png
+#| fig-dpi: 300
 
 cols <- names(icdOut[[1]])
 icdOut[[1]] <- setNames(icdOut[[1]], paste(cols, "all", sep ="_"))
