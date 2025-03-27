@@ -198,10 +198,10 @@ withr::with_options(list(warn = -1),
 #| label: fig-icd
 #| warning: false
 #| fig-cap: "Andel diagnoserfordeling av skadepasienter"
-#| fig-height: 7
+#| fig-height: 6
 #| fig-width: 7
 #| fig-format: png
-#| fig-dpi: 300
+#| fig-dpi: 200 
 
 cols <- names(icdOut[[1]])
 icdOut[[1]] <- setNames(icdOut[[1]], paste(cols, "all", sep ="_"))
