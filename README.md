@@ -7,6 +7,6 @@ Different codes
 - `./data/ICD10codes.RDS` er ICD-10 koder hentet fra [GitHub](https://raw.githubusercontent.com/k4m1113/ICD-10-CSV/master/codes.csv)
 - `./data/validCodes.RDS` er utvalgte koder som skal brukes i analysen for Fyrtårnprosjektet
 
-# Misc
+# Rapporter
 - Skader og ulykker bland [fotgjengere](https://fyrtaarn.github.io/analysis/pedestrian)
 - [Representativitet](https://fyrtaarn.github.io/analysis/representativitet) analyse
