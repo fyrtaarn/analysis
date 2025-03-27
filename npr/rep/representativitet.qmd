@@ -10,13 +10,16 @@ format:
     self-contained: true
   pdf:
     toc: false
+knitr:
+  opts_chunk:
+    fig.path: figures/
 ---
 
 ```{r package}
 #| output: false
 #| echo: false
 
-pkgs <- c("data.table", "fst", "fyr", "ggplot2", "gt", "rreg")
+pkgs <- c("data.table", "fst", "fyr", "ggplot2", "gt", "rreg", "withr")
 if(!require(pak)) install.packages("pacman")
 pacman::p_load(char = pkgs)
 
@@ -52,22 +55,11 @@ Nye tilfeller av personskader innen aktivitetsdata for somatikk velges ut på de
  - Start av behandling for skadetilfellet i 2023.
  - Planlagt (elektiv) behandling er holdt utenfor.
 
-Et skadetilfelle kan generere flere kontakter med helsevesenet. For å unngå å telle hvert skadetilfelle flere ganger, skal samme skade ikke være mindre enn **3 dager** fra forrige registreringsdato (`innDato`) og at kontakten må være registrert med akutt hastegrad. Dersom pasienten er registrert med flere slike opphold for samme skade på mer enn 3 dager fra forrige registreringsdato, kan samme skade bli telt flere ganger. Det er **`r format(nrow(DT), big.mark = " ")`** skadetilfeller ble registeret i 2023 i hele landet hvor **`r format(nrow(dt), big.mark = " ")`** skadetilfeller er rapportert fra Fyrtårnenhetene.
+Et skadetilfelle kan generere flere kontakter med helsevesenet. For å unngå å telle hvert skadetilfelle flere ganger, skal samme skade ikke være mindre enn **3 dager** fra forrige registreringsdato (`innDato`) og at kontakten må være registrert med akutt hastegrad. Dersom pasienten er registrert med flere slike opphold for samme skade på mer enn 3 dager fra forrige registreringsdato, kan samme skade bli telt flere ganger. Det er **`r format(nrow(DT), big.mark = " ")`** skadetilfeller ble registeret i 2023 i hele landet hvor **`r format(nrow(dt), big.mark = " ")`** skadetilfeller er rapportert fra Fyrtårnenhetene. Analysen som er gjort her er basert på [rapporten](https://www.tryggtrafikk.no/content/uploads/2024/03/Fyrtarnsprosjektet2021_nett_enkeltsider.pdf "rapport") (vedlegg 5) fra Trygg Trafikk. 
 
 ## Kjønn
 
-Kjønnsfordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
-
-```{r}
-#| echo: false
-#| label: tbl-kjonnAll
-#| tbl-cap: "Alle sykehusene og legevakter"
-
-gt(kjonn[[1]]) |>
-  opt_stylize(style = 6, color = 'gray')
-```
-
-{{< pagebreak >}}
+Kjønnsfordelingen i prosent av behandlede skadepasienter ved Fyrtårnenhetene sammenliknet med alle sykehusene og legevaktene (inkludert Fyrtårnenhetene).
 
 
 ```{r}
@@ -78,6 +70,19 @@ gt(kjonn[[1]]) |>
 gt(kjonn[[2]]) |>
   opt_stylize(style = 6, color = 'gray')
 ```
+
+{{< pagebreak >}}
+
+```{r}
+#| echo: false
+#| label: tbl-kjonnAll
+#| tbl-cap: "Alle sykehusene og legevakter"
+
+gt(kjonn[[1]]) |>
+  opt_stylize(style = 6, color = 'gray')
+```
+
+Kjønnsfordelingen er nokså like mellom Fyrtårnenhetene og alle sykehusene og legevaktene (inkludert Fyrtårnenhetene). Dette vises tydeligere i @fig-kjonnFyr. 
 
 ```{r}
 #| echo: false
@@ -96,6 +101,7 @@ rreg::regcom(gender, x = "beskrivelse_all",
              yl = "prosent_fyr", yc = "prosent_all",
              lab1 = "Fyrtrn", lab2 = "Alle",
              leg1 = "Fyrtrn", leg2 = "Alle",
+             scale = "Prosent",
              title = "Kjønnsfordelingen av skadepasienter")
 
 ```
@@ -104,7 +110,17 @@ rreg::regcom(gender, x = "beskrivelse_all",
 
 ## Alder
 
-Aldersfordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
+Aldersfordelingen i prosent av behandlede skadepasienter ved Fyrtårnenhetene sammenlignet med alle sykehusene og legevaktene (inkludert Fyrtårnenhetene).
+
+
+```{r}
+#| echo: false
+#| label: tbl-alderFyr
+#| tbl-cap: "Fyrtårnsykehusene og legevakter"
+
+gt(age[[2]]) |>
+  opt_stylize(style = 6, color = 'gray')
+```
 
 
 ```{r}
@@ -116,14 +132,7 @@ gt(age[[1]]) |>
   opt_stylize(style = 6, color = 'gray')
 ```
 
-```{r}
-#| echo: false
-#| label: tbl-alderFyr
-#| tbl-cap: "Fyrtårnsykehusene og legevakter"
-
-gt(age[[2]]) |>
-  opt_stylize(style = 6, color = 'gray')
-```
+Andelen skadde personer under 45 år er høyere i Fyrtårnenhetene sammenlignet med alle enhetene samlet, mens andelen av skadde personer over 44 år er høyere i alle enhetene sammenlignet med Fyrtårnenhetene. Dette fremgår tydelig av @fig-alderFyr nedenfor.
 
 ```{r}
 #| echo: false
@@ -146,6 +155,7 @@ rreg::regcom(alder, x = "agegp_all",
              lab1 = "Fyrtrn", lab2 = "Alle",
              leg1 = "Fyrtrn", leg2 = "Alle",
              ascending = FALSE,
+             scale = "Prosent",
              title = "Andel aldersfordelingen av skadepasienter")
 
 ```
@@ -154,7 +164,7 @@ rreg::regcom(alder, x = "agegp_all",
 
 ## Diagnoser
 
-Diagnosefordelingen i % av behandlede skadepasienter ved alle sykehusene og legevaktene sammenlikne med Fyrtårnenhetene.
+Diagnosefordelingen i prosent av behandlede skadepasienter ved Fyrtårnenhetene sammenlignet med alle sykehusene og legevaktene (inkludert Fyrtårnenhetene).
 
 ```{r diagnose, file="diagnose.R"}
 #| output: false
@@ -168,8 +178,9 @@ Diagnosefordelingen i % av behandlede skadepasienter ved alle sykehusene og lege
 #| label: tbl-icdAll
 #| tbl-cap: "Alle sykehusene og legevakter"
 
-gt(icdOut[[1]]) |>
-  opt_stylize(style = 6, color = 'gray')
+withr::with_options(list(warn = -1),
+                    gt(icdOut[[1]][order(as.numeric(icd))]) |>
+                    opt_stylize(style = 6, color = 'gray'))
 ```
 
 ```{r}
@@ -177,8 +188,9 @@ gt(icdOut[[1]]) |>
 #| label: tbl-icdFyr
 #| tbl-cap: "Fyrtårnsykehusene og legevakter"
 
-gt(icdOut[[2]]) |>
-  opt_stylize(style = 6, color = 'gray')
+withr::with_options(list(warn = -1),
+                    gt(icdOut[[2]][order(as.numeric(icd))]) |>
+                    opt_stylize(style = 6, color = 'gray'))
 ```
 
 ```{r}
@@ -206,5 +218,6 @@ rreg::regcom(icdTbl, x = "beskrivelse_all",
              lab1 = "Fyrtrn", lab2 = "Alle",
              leg1 = "Fyrtrn", leg2 = "Alle",
              ascending = TRUE,
+             scale = "Prosent",
              title = "Andel diagnoserfordeling av skadepasienter")
 ```

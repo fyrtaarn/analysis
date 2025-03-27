@@ -194,3 +194,8 @@ icdkode <- data.table(kode = 0:17,
 
 
 show_pro(icd, "icd", code = icdkode)
+
+
+### Causes (FMDS) ----------
+
+dx <- fyr::find_cause(fmd23, som23)
